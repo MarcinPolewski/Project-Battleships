@@ -80,6 +80,7 @@ class ScreenHandler:
             # @TODO draw buttons
             pass
 
+
 class Visualizer:
     """handles visualising game status on the board(clouds, ships)"""
 
@@ -263,3 +264,57 @@ class InputHandler:
         else:  # mouse button has been released
             if self.players_board_released(mouse_position):
                 pass
+
+
+def main():
+    pygame.init()
+    clock = pygame.time.Clock()
+
+    # configurating screen
+    game_screen = pygame.display.set_mode(
+        (constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT)
+    )
+    pygame.display.set_caption("Battleships")
+
+    game_controller = GameLogicController()
+    input_handler = InputHandler(game_controller)
+    visualizer = Visualizer(screen=game_screen, game_controller=game_controller)
+    screen_handler = ScreenHandler(screen=game_screen, game_controller=game_controller)
+
+    # @TODO delete, only for testing
+    game_controller.game_mode_selected(gamemode=constants.PVC)
+
+    # main game loop, checks for events
+    game_is_running = True
+    while game_is_running:
+        # setting frames per second
+        clock.tick(constants.FPS)
+
+        # EVENT HANDLER
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_is_running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                input_handler.mouse_button_interaction(
+                    mouse_position=pygame.mouse.get_pos(), is_pressed=True
+                )
+            if event.type == pygame.MOUSEBUTTONUP:
+                input_handler.mouse_button_interaction(
+                    mouse_position=pygame.mouse.get_pos(), is_pressed=False
+                )
+
+        # UPDATE ELEMENTS
+        screen_handler.update()
+        visualizer.update()
+
+        # DRAW ELEMENTS
+        screen_handler.draw()
+        visualizer.draw()
+
+        pygame.display.update()
+
+    pygame.quit()
+
+
+if __name__ == "__main__":
+    main()
