@@ -55,6 +55,7 @@ class GameLogicController:
         return self._player_attacked
 
     def switch_current_player(self):
+        """handles switching users in PVP"""
         if self._current_player == self._player1:
             self._current_player = self._player2
             self._player_attacked = self._player1
@@ -65,6 +66,8 @@ class GameLogicController:
         self._phase = constants.BLACKSCREEN_PHASE
 
     def game_mode_selected(self, gamemode):
+        """trigged when user(s) have selected gamemode, initializes players
+        and in case of PVC bot places ships"""
         # initializing players
         self._player1 = Player(
             board_height=self._board_height, board_width=self._board_width
@@ -117,6 +120,7 @@ class GameLogicController:
             # @TODO add prompting user
 
     def position_ships_phase(self, start_row, start_column, end_row, end_column):
+        """handles game positioning phase"""
         # current player postions ships
         self.player_positions_ships(
             self._current_player, start_row, start_column, end_row, end_column
@@ -134,6 +138,7 @@ class GameLogicController:
             self.switch_current_player()
 
     def play_game_phase(self, shot_row, shot_column):
+        """handles main game phase(when player(s) shoot)"""
         # current player performs attack
         self._current_player.perform_attack(
             opponent=self._player_attacked,
@@ -161,13 +166,17 @@ class GameLogicController:
             self._player2.perform_attack(self._player1)
 
     def exit_black_screen_phase(self):
+        """method trigged when user have switch in real world
+        and current user is ready to proceed"""
         self._phase = constants.GAME_PHASE
 
     def game_result_phase(self, mouse_was_pressed, mouse_was_released, mouse_position):
+        """method handles end of the game phase"""
         pass
         # @TODO
 
     def button_pressed(self, button_type):
+        """method triggers right method when particular button was pressed"""
         # @FIXME nie trzeba dwa razy sprawdzać, juz kontroler patrzy
         # jaka jest faza
         if self._phase == constants.GAME_START_SCREEN:
@@ -188,7 +197,7 @@ class GameLogicController:
             pass
 
     def players_cells_selected(self, start_row, start_column, end_row, end_column):
-        """method trigger when user has selected cells"""
+        """method trigger when user has selected cells on his own(left) board"""
         if self._phase == constants.POSITIONING_PHASE:
             self.position_ships_phase(
                 start_row=start_row,
