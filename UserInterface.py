@@ -170,3 +170,96 @@ class Visualizer:
         if self.phase in [constants.GAME_PHASE, constants.POSITIONING_PHASE]:
             self.draw_one_player(player=self.player1, for_left_table=True)
             self.draw_one_player(player=self.player2, for_left_table=False)
+
+
+class InputHandler:
+    """handles interaction with user and triggers
+    corresponding methods in gamecontroller"""
+
+    def __init__(self, game_controller):
+        self._game_controller = game_controller
+        self._mouse_press_start_column = None
+        self._mouse_press_start_row = None
+
+    def players_board_pressed(self, mouse_position):
+        try:
+            row_and_column = calculate_row_and_column(
+                coordinates=mouse_position, from_left_table=True
+            )
+
+            # player's board is pressed
+            row, column = row_and_column
+            self._mouse_press_start_column = column
+            self._mouse_press_start_row = row
+
+        except OutOfTableError:
+            return False
+
+    def players_board_released(self, mouse_position):
+        try:
+            row_and_column = calculate_row_and_column(
+                coordinates=mouse_position, from_left_table=True
+            )
+            # mouse on player's board has been released and press
+            # has definitely occured on his board
+
+            start_row = self._mouse_press_start_row
+            start_column = self._mouse_press_start_column
+            end_row, end_column = row_and_column
+
+            # check if in one dimension
+            if (start_row != end_row) and (start_column != end_column):
+                return False
+
+            self._game_controller.players_cells_selected(
+                start_row=start_row,
+                start_column=start_column,
+                end_row=end_row,
+                end_column=end_column,
+            )
+
+            return True
+
+        except OutOfTableError:
+            return False
+
+    def enemys_board_pressed(self, mouse_position):
+        try:
+            row_and_column = calculate_row_and_column(
+                coordinates=mouse_position, from_left_table=False
+            )
+            # enemy's board is pressed
+            row, column = row_and_column
+            self._game_controller.enemys_board_mouse_pressed(row, column)
+
+            return True
+
+        except OutOfTableError:
+            return False
+
+    def button_was_pressed(self, mouse_position):
+        if self._game_controller.phase == constants.GAME_START_SCREEN:
+            # PVP and PVC buttons are displayed
+            pass
+        elif self._game_controller.phase == constants.BLACKSCREEN_PHASE:
+            # press anywhere to continue
+            pass
+        elif self._game_controller.phase == constants.GAME_RESULT_PHASE:
+            # quit and play again buttons are displayed
+            pass
+
+        # @TODO implement gamemode buttons
+        # @TODO impolement end screen buttons
+
+    def mouse_button_interaction(self, mouse_position, is_pressed):
+        """method checks which interaction has been performed"""
+        if is_pressed:  # mouse button has been pressed
+            if self.button_was_pressed(mouse_position):
+                pass
+            elif self.players_board_pressed(mouse_position):
+                pass
+            elif self.enemys_board_pressed(mouse_position):
+                pass
+        else:  # mouse button has been released
+            if self.players_board_released(mouse_position):
+                pass
