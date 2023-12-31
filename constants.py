@@ -50,3 +50,15 @@ TABLE_HORIZONTAL_OFFSET = 150
 TABLE_VERTICAL_OFFSET = 100
 TABLE_SIZE = 600  # board is  600pxx600px
 CELL_SIZE = 60  # each cell of table is 60px x 60px
+
+FPS = 60
+
+# button id-s
+PLAY_AGAIN_BUTTON = 5
+QUIT_BUTTON = 10
+PVP_BUTTON = 15
+PVC_BUTTON = 20
+
+# background animation cooldown (ms)
+BACKGROUND_COOLDOWN = 900
+CLOUD_COOLDOWN = 900
