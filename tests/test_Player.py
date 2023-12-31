@@ -1,11 +1,10 @@
-from GameErrors import CellAlreadyShotError, ShipPlacingError
+from GameErrors import ShipPlacingError, NotSuchShipToPlaceError
 from BoardCell import BoardCell
 from Player import Player
 import constants
 from Ships import Ship, Carrier, Battleship, Cruiser, PatrolShip
 
 import pytest
-import numpy as np
 
 
 def test_Player_init(monkeypatch):
@@ -125,6 +124,35 @@ def test_Player_potential_targets():
     assert (1, 0) in player1._potential_targets
     assert (1, 1) in player1._potential_targets
     assert (1, 2) in player1._potential_targets
+
+
+def test_Player_add_ship_that_player_does_not_have(monkeypatch):
+    standard_ship_quantities = {
+        "Carrier": 1,
+    }
+    monkeypatch.setattr("constants.STANDARD_SHIP_QUANTITIES", standard_ship_quantities)
+
+    player1 = Player(10, 10)
+
+    player1.add_ship(
+        length=5, orientation=constants.SHIP_HORIZONTAL, coordinate_x=0, coordinate_y=0
+    )
+
+    with pytest.raises(NotSuchShipToPlaceError):
+        player1.add_ship(
+            length=5,
+            orientation=constants.SHIP_HORIZONTAL,
+            coordinate_x=0,
+            coordinate_y=1,
+        )
+
+    with pytest.raises(NotSuchShipToPlaceError):
+        player1.add_ship(
+            length=3,
+            orientation=constants.SHIP_HORIZONTAL,
+            coordinate_x=0,
+            coordinate_y=1,
+        )
 
 
 def test_Player_add_ship_Vertical(monkeypatch):

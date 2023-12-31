@@ -16,3 +16,9 @@ class ShipPlacingError(Exception):
         super().__init__(
             "ship cannot be placed at this position(colision or outside the board)"
         )
+
+
+class NotSuchShipToPlaceError(Exception):
+    def __init__(self, lenght):
+        super().__init__("player does not have a ship of length={lenght} to place")
+        self._lenght = lenght

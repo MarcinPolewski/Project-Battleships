@@ -1,4 +1,4 @@
-from GameErrors import CellAlreadyShotError, ShipPlacingError
+from GameErrors import CellAlreadyShotError, ShipPlacingError, NotSuchShipToPlaceError
 from BoardCell import BoardCell
 import constants
 from Ships import Ship, Carrier, Battleship, Cruiser, PatrolShip
@@ -99,12 +99,6 @@ class Player:
         or if it is out of the board or if ther's a colision
         returns new_ship instance
         """
-        # check if provided orientation is correct
-        if (
-            orientation != constants.SHIP_HORIZONTAL
-            and orientation != constants.SHIP_VERTICAL
-        ):
-            raise ShipOrientationError()
 
         # check if ship fits on the board
         if orientation == constants.SHIP_VERTICAL and (
