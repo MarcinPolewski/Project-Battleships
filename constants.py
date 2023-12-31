@@ -40,3 +40,13 @@ GAME_RESULT_PHASE = 15
 # gamemodes
 PVP = 10  # player vs player
 PVC = 50  # player vs computer
+
+# screen dimensions
+SCREEN_WIDTH = 1600
+SCREEN_HEIGHT = 900
+
+# screen positioning
+TABLE_HORIZONTAL_OFFSET = 150
+TABLE_VERTICAL_OFFSET = 100
+TABLE_SIZE = 600  # board is  600pxx600px
+CELL_SIZE = 60  # each cell of table is 60px x 60px
