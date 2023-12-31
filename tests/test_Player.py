@@ -1,6 +1,6 @@
 from GameErrors import ShipPlacingError, NotSuchShipToPlaceError
 from BoardCell import BoardCell
-from Player import Player
+from Player import Player, BotPlayer
 import constants
 from Ships import Ship, Carrier, Battleship, Cruiser, PatrolShip
 
@@ -363,3 +363,129 @@ def test_Player_perform_attack(monkeypatch):
     assert player1.board[0, 0].ship_handle.hit_counter == 3
 
     assert player1.board[0, 0].ship_handle.is_down()
+
+
+def test_BotPlayer_init():
+    bot = BotPlayer(board_height=10, board_width=15)
+    assert bot.previous_attack() == (False, None, None)
+
+
+def test_BotPlayer_find_new_target(monkeypatch):
+    bot = BotPlayer(board_height=10, board_width=15)
+
+    def return_previous(_):
+        return (True, 1, 1)
+
+    monkeypatch.setattr("Player.BotPlayer.previous_attack", return_previous)
+    bot._previous_attack = (True, 1, 1)
+    new_target = bot.find_new_target()
+
+    assert (
+        new_target == (0, 1)
+        or new_target == (1, 0)
+        or new_target == (1, 2)
+        or new_target == (2, 1)
+    )
+
+
+def test_BotPlayer_find_new_target_corner(monkeypatch):
+    bot = BotPlayer(board_height=5, board_width=5)
+
+    def return_previous(_):
+        return (True, 4, 4)
+
+    monkeypatch.setattr("Player.BotPlayer.previous_attack", return_previous)
+    bot._previous_attack = (True, 1, 1)
+    new_target = bot.find_new_target()
+
+    assert new_target == (4, 3) or new_target == (3, 4)
+
+
+def test_BotPlayer_find_new_target_random():
+    bot = BotPlayer(board_height=5, board_width=5)
+    coordinate_y, coordinate_x = bot.find_new_target()
+    assert (coordinate_y, coordinate_x) in bot.potential_targets
+
+
+def test_BotPlayer_preform_attack(monkeypatch):
+    standard_ship_quantities = {
+        "Carrier": 1,
+        "Battleship": 1,
+        "Cruiser": 4,
+        "PatrolShip": 3,
+    }
+    monkeypatch.setattr("constants.STANDARD_SHIP_QUANTITIES", standard_ship_quantities)
+
+    bot = BotPlayer(board_height=3, board_width=1)
+    player = Player(3, 1)
+    player.add_ship(3, constants.SHIP_VERTICAL, 0, 0)
+    ship_handle = player.board[0, 0].ship_handle
+
+    bot.perform_attack(player)
+    assert ship_handle.hit_counter == 1
+    assert len(bot.potential_targets) == 2
+
+    bot.perform_attack(player)
+    assert ship_handle.hit_counter == 2
+    assert len(bot.potential_targets) == 1
+
+    bot.perform_attack(player)
+    assert ship_handle.hit_counter == 3
+    assert len(bot.potential_targets) == 0
+
+
+def test_BotPlayer_perform_attack_adjusting_potential_targets(monkeypatch):
+    def return_new_target(_):
+        return (2, 2)
+
+    monkeypatch.setattr("Player.BotPlayer.find_new_target", return_new_target)
+
+    standard_ship_quantities = {
+        "Carrier": 1,
+        "Battleship": 1,
+        "Cruiser": 4,
+        "PatrolShip": 3,
+    }
+    monkeypatch.setattr("constants.STANDARD_SHIP_QUANTITIES", standard_ship_quantities)
+
+    bot = BotPlayer(board_height=10, board_width=10)
+    player = Player(board_height=10, board_width=10)
+
+    player.add_ship(5, constants.SHIP_HORIZONTAL, 2, 2)
+    bot.perform_attack(player)
+
+    assert (2, 2) not in bot.potential_targets
+    assert len(bot.potential_targets) == 99
+
+
+def test_BotPlayer_position_ships(monkeypatch):
+    standard_ship_quantities = {
+        "Carrier": 1,
+        # "Battleship": 0,
+        # "Cruiser": 0,
+        # "PatrolShip": 0,
+    }
+    monkeypatch.setattr("constants.STANDARD_SHIP_QUANTITIES", standard_ship_quantities)
+
+    bot = BotPlayer(5, 1)
+    bot.position_ships()
+    assert len(bot.fleet) == 1
+    for i in range(5):
+        assert not bot.board[i, 0].is_free
+
+
+def test_BotPlayer_position_ships_standard_size(monkeypatch):
+    standard_ship_quantities = {
+        "Carrier": 1,
+        "Battleship": 1,
+        "Cruiser": 4,
+        "PatrolShip": 3,
+    }
+    monkeypatch.setattr("constants.STANDARD_SHIP_QUANTITIES", standard_ship_quantities)
+
+    bot = BotPlayer(10, 10)
+    assert len(bot.ships_to_place) == 9
+
+    bot.position_ships()
+    assert len(bot.ships_to_place) == 0
+    assert len(bot.fleet) == 9

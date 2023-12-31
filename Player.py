@@ -5,6 +5,7 @@ from Ships import Ship, Carrier, Battleship, Cruiser, PatrolShip
 
 import numpy as np
 import copy
+import random
 
 
 class Player:
@@ -191,3 +192,79 @@ class Player:
 
 class BotPlayer(Player):
     """automates some functionality of Player class, to create a game Bot"""
+
+    def __init__(
+        self,
+        board_height=constants.BOARD_CELL_SIZE,
+        board_width=constants.BOARD_CELL_SIZE,
+    ):
+        super().__init__(board_height=board_height, board_width=board_width)
+        self._previous_attack = (False, None, None)
+
+    def previous_attack(self):
+        return self._previous_attack
+
+    def find_new_target(self):
+        """returns (y,x) coordinates of next targeted BoardCell"""
+        look_nearby, prevoius_y, previous_x = self.previous_attack()
+
+        if look_nearby:
+            surrounding_potential_targets = []
+            if (prevoius_y, previous_x + 1) in self._potential_targets:
+                surrounding_potential_targets.append((prevoius_y, previous_x + 1))
+            if (prevoius_y, previous_x - 1) in self._potential_targets:
+                surrounding_potential_targets.append((prevoius_y, previous_x - 1))
+            if (prevoius_y - 1, previous_x) in self._potential_targets:
+                surrounding_potential_targets.append((prevoius_y - 1, previous_x))
+            if (prevoius_y + 1, previous_x) in self._potential_targets:
+                surrounding_potential_targets.append((prevoius_y + 1, previous_x))
+
+            # if therea are  surrounding board cells, that have not been shot
+            if surrounding_potential_targets:
+                return random.choice(surrounding_potential_targets)
+
+        # bot picks a random cell on board
+        new_target_y, new_target_x = random.choice(self._potential_targets)
+        return (new_target_y, new_target_x)
+
+    def perform_attack(self, opponent):
+        """
+        if previous attack was success full, bot will shoot
+        at surrounding cells
+        """
+
+        if not self._potential_targets:
+            # bot has no potential targes, so it cannot perform
+            return
+
+        new_target_y, new_target_x = self.find_new_target()
+
+        attack_status = opponent.take_attack(
+            coordinate_x=new_target_x, coordinate_y=new_target_y
+        )
+        self._previous_attack = (
+            True if attack_status == constants.SHIP_HIT else False,
+            new_target_y,
+            new_target_x,
+        )
+        self._potential_targets.remove((new_target_y, new_target_x))
+
+    def position_ships(self):
+        while self._ships_to_place:
+            ship_to_position = self._ships_to_place[0]
+            is_positioned = False
+            while not is_positioned:
+                try:
+                    rand_x = random.randint(0, self.board_width - 1)
+                    rand_y = random.randint(0, self.board_height - 1)
+                    rand_orientation = random.choice(
+                        [constants.SHIP_VERTICAL, constants.SHIP_HORIZONTAL]
+                    )
+                    self.add_ship(
+                        ship_to_position.length, rand_orientation, rand_x, rand_y
+                    )
+                    is_positioned = True
+                except Exception:
+                    """we do not want to do anything, when bot cannot place ship
+                    where it can't"""
+                    pass
