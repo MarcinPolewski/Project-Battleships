@@ -29,3 +29,14 @@ STANDARD_SHIP_QUANTITIES = {
 
 # table configurations
 BOARD_CELL_SIZE = 10  # how many cells in a row or a column
+
+# game phases
+GAME_START_SCREEN = 3
+POSITIONING_PHASE = 10
+GAME_PHASE = 5
+BLACKSCREEN_PHASE = 20
+GAME_RESULT_PHASE = 15
+
+# gamemodes
+PVP = 10  # player vs player
+PVC = 50  # player vs computer
