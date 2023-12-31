@@ -262,6 +262,14 @@ class InputHandler:
         except OutOfTableError:
             return False
 
+    def end_blackscreen_phase_pressed(self):
+        """checks if user has pressed mouse, to proceed with game
+        and return True. Else returns False"""
+        if self._game_controller.phase == constants.BLACKSCREEN_PHASE:
+            self._game_controller.exit_black_screen_phase()
+            return True
+        return False
+
     def button_was_pressed(self, mouse_position):
         """checks if button was pressed, if so triggers right GameLogicController method
         and return True. Else returns False"""
@@ -281,7 +289,9 @@ class InputHandler:
     def mouse_button_interaction(self, mouse_position, is_pressed):
         """method checks which interaction has been performed"""
         if is_pressed:  # mouse button has been pressed
-            if self.button_was_pressed(mouse_position):
+            if self.end_blackscreen_phase_pressed():
+                pass
+            elif self.button_was_pressed(mouse_position):
                 pass
             elif self.players_board_pressed(mouse_position):
                 pass
