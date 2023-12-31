@@ -9,3 +9,10 @@ class OcupiedCellError(Exception):
 class CellAlreadyShotError(Exception):
     def __init__(self):
         super().__init__("Shot at this cell was already performed")
+
+
+class ShipPlacingError(Exception):
+    def __init__(self):
+        super().__init__(
+            "ship cannot be placed at this position(colision or outside the board)"
+        )

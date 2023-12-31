@@ -14,3 +14,18 @@ SHIP_LENGTHS = {
     "Cruiser": CARRIER_LENGTH,
     "PatrolShip": PATROL_SHIP_LENGTH,
 }
+
+# ship orientations
+SHIP_HORIZONTAL = 1
+SHIP_VERTICAL = 2
+
+# game configurations
+STANDARD_SHIP_QUANTITIES = {
+    "Carrier": 1,
+    "Battleship": 1,
+    "Cruiser": 4,
+    "PatrolShip": 3,
+}
+
+# table configurations
+BOARD_CELL_SIZE = 10  # how many cells in a row or a column
