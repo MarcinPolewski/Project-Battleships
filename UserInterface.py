@@ -34,7 +34,8 @@ class ScreenHandler:
         return self._game_controller.phase
 
     def update(self):
-        # updating backround animation
+        """updated backround animations"""
+
         # if enough time has passed since last update
         if (
             pygame.time.get_ticks() - self._last_background_change
@@ -47,30 +48,38 @@ class ScreenHandler:
             self._current_background = self._background_images[self._background_idx]
             self._last_background_change = pygame.time.get_ticks()
 
-    def draw(self):
-        # drawing see
+    def draw_backroung(self):
+        """draws background on screen"""
         self._screen.blit(self._current_background, (0, 0))
+
+    def draw_tables(self):
+        """draws tables on screen"""
+        # drawing left table
+        self._screen.blit(
+            self._table_image,
+            (constants.TABLE_HORIZONTAL_OFFSET, constants.TABLE_VERTICAL_OFFSET),
+        )
+        # drawing right table
+        self._screen.blit(
+            self._table_image,
+            (
+                constants.SCREEN_WIDTH
+                - constants.TABLE_HORIZONTAL_OFFSET
+                - constants.TABLE_SIZE,
+                constants.TABLE_VERTICAL_OFFSET,
+            ),
+        )
+
+    def draw(self):
+        """method draws backround and tables"""
+        self.draw_backroung()
 
         if self.phase == constants.GAME_START_SCREEN:
             # @TODO write title on screen
             # @TODO draw buttons on screen
             pass
         elif self.phase in [constants.GAME_PHASE, constants.POSITIONING_PHASE]:
-            # drawing left table
-            self._screen.blit(
-                self._table_image,
-                (constants.TABLE_HORIZONTAL_OFFSET, constants.TABLE_VERTICAL_OFFSET),
-            )
-            # drawing right table
-            self._screen.blit(
-                self._table_image,
-                (
-                    constants.SCREEN_WIDTH
-                    - constants.TABLE_HORIZONTAL_OFFSET
-                    - constants.TABLE_SIZE,
-                    constants.TABLE_VERTICAL_OFFSET,
-                ),
-            )
+            self.draw_tables()
         elif self.phase == constants.BLACKSCREEN_PHASE:
             # @TODO write promp on screen
             pass
@@ -82,7 +91,7 @@ class ScreenHandler:
 
 
 class Visualizer:
-    """handles visualising game status on the board(clouds, ships)"""
+    """handles visualising game situation on boards"""
 
     def __init__(self, screen, game_controller):
         self._screen = screen
@@ -131,9 +140,11 @@ class Visualizer:
         pass
 
     def draw_one_player(self, player, for_left_table):
-        # @TODO add animation support for this method
-        """displays only players fleet"""
-        players_board = player.board
+        """draws view of player on the board
+        if for_left_table is True draws player's fleet on left table (ships)
+        else draws what player's opponent sees on right table (clouds and ships)
+        """
+        # @TODO add animation support for this methodś
         board_height = player.board_height
         board_width = player.board_width
 
@@ -175,7 +186,12 @@ class Visualizer:
 
 class InputHandler:
     """handles interaction with user and triggers
-    corresponding methods in gamecontroller"""
+    corresponding methods in GameLogicController
+
+    class has methods, which check if particular event has occured
+    if so they trigger right method in GameLogicController and return True,
+    so mouse_button_interaction does not have to check further
+    """
 
     def __init__(self, game_controller):
         self._game_controller = game_controller
@@ -183,6 +199,8 @@ class InputHandler:
         self._mouse_press_start_row = None
 
     def players_board_pressed(self, mouse_position):
+        """checks if players board was pressed. If so saves row and column
+        and returns True else False"""
         try:
             row_and_column = calculate_row_and_column(
                 coordinates=mouse_position, from_left_table=True
@@ -197,6 +215,10 @@ class InputHandler:
             return False
 
     def players_board_released(self, mouse_position):
+        """checks if mouse button was released on players board and if
+        user has selected cells in one line. If so triggers right GameLogicController method
+        and return True. Else return False
+        """
         try:
             row_and_column = calculate_row_and_column(
                 coordinates=mouse_position, from_left_table=True
@@ -225,6 +247,8 @@ class InputHandler:
             return False
 
     def enemys_board_pressed(self, mouse_position):
+        """checks if enemy's board was pressed if so triggers right GameLogicController method
+        and return True. Else returns False"""
         try:
             row_and_column = calculate_row_and_column(
                 coordinates=mouse_position, from_left_table=False
@@ -239,6 +263,8 @@ class InputHandler:
             return False
 
     def button_was_pressed(self, mouse_position):
+        """checks if button was pressed, if so triggers right GameLogicController method
+        and return True. Else returns False"""
         if self._game_controller.phase == constants.GAME_START_SCREEN:
             # PVP and PVC buttons are displayed
             pass
