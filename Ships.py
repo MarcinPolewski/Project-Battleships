@@ -4,8 +4,12 @@ import constants
 class Ship:
     """represents single ship on gameboard
 
-    :param length: represents how many board cells does this ship occupy
-    :param is_segemnt_hit: list representing if part of ship was shot
+    :param _length: represents how many board cells does this ship occupy
+    :type _length: int
+    :param _hit_counter: stores information how many times ship has been hit
+    :type _hit_counter: int
+    :param _is_positioned: is True if this ship has been placed on the board
+    :type _is_positioned: bool
     """
 
     def __init__(self, length):
@@ -26,9 +30,11 @@ class Ship:
         return self._is_positioned
 
     def is_down(self):
+        """return True if all parts of ship have been hit"""
         return self._hit_counter == self._length
 
     def take_damage(self):
+        """handles attack of ship"""
         self._hit_counter += 1
         self._hit_counter = min(self._hit_counter, self._length)
 
@@ -36,6 +42,7 @@ class Ship:
         return True if self.is_down() else False
 
     def position_ship(self):
+        """positions ship on game board"""
         self._is_positioned = True
 
 
