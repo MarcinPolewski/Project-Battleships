@@ -207,10 +207,12 @@ class Visualizer:
                         self._screen.blit(self._ship_images[3], position)
 
     def draw(self):
-        """draws player1's view on the board"""
+        """draws current player's view on the board"""
         if self.phase in [constants.GAME_PHASE, constants.POSITIONING_PHASE]:
-            self.draw_one_player(player=self.player1, for_left_table=True)
-            self.draw_one_player(player=self.player2, for_left_table=False)
+            current_player = self._game_controller.current_player
+            player_attacked = self._game_controller.player_attacked
+            self.draw_one_player(player=current_player, for_left_table=True)
+            self.draw_one_player(player=player_attacked, for_left_table=False)
 
 
 class InputHandler:
@@ -394,7 +396,6 @@ def main():
                 input_handler.mouse_button_interaction(
                     mouse_position=pygame.mouse.get_pos(), is_pressed=False
                 )
-
     pygame.quit()
 
 
