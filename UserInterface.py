@@ -41,6 +41,14 @@ class ScreenHandler:
             text_size=constants.LOGO_TEXT_SIZE,
             text_color=(255, 0, 0),
         )
+
+        # generate message for black screen
+        self._blackscreen_prompt = get_text_image(
+            text="Switch user at the computer, press mouse button to continue...",
+            text_size=constants.MESSAGE_TO_SWITCH_FONT_SIZE,
+            text_color=(255, 255, 255),
+        )
+
         # calculating position of text on logo
         logo_text_position = calculate_text_position_for_logo(
             image_height=self._logo.get_height(),
@@ -102,6 +110,16 @@ class ScreenHandler:
             ),
         )
 
+    def draw_message_to_switch(self):
+        image_width = self._blackscreen_prompt.get_width()
+        image_height = self._blackscreen_prompt.get_height()
+
+        # @TODO use function from TextImageGenerator
+        x = (constants.SCREEN_WIDTH - image_width) // 2
+        y = (constants.SCREEN_HEIGHT - image_height) // 2
+
+        self._screen.blit(self._blackscreen_prompt, (x, y))
+
     def draw(self):
         """method draws backround and tables"""
         self.draw_backroung()
@@ -111,8 +129,7 @@ class ScreenHandler:
         elif self.phase in [constants.GAME_PHASE, constants.POSITIONING_PHASE]:
             self.draw_tables()
         elif self.phase == constants.BLACKSCREEN_PHASE:
-            # @TODO write promp on screen
-            pass
+            self.draw_message_to_switch()
 
         elif self.phase == constants.GAME_RESULT_PHASE:
             # @TODO write winner on screen
