@@ -1,5 +1,9 @@
 import pygame
 import constants
+from TextImageGenerator import (
+    get_text_image,
+    calculate_positioning_in_the_middle_of_image,
+)
 
 
 class Button:
@@ -123,6 +127,22 @@ class PlayPVPButton(Button):
     def __init__(self, screen):
         # loading button image
         image = pygame.image.load("assets/Button.png")
+        # rendering image of text
+        text_image = get_text_image(
+            text="Play PVP",
+            text_size=constants.BUTTON_TEXT_SIZE,
+            text_color=constants.BUTTON_TEXT_COLOR,
+        )
+        # calculating positon of text on the button
+        text_position = calculate_positioning_in_the_middle_of_image(
+            image_height=image.get_height(),
+            image_width=image.get_width(),
+            text_height=text_image.get_height(),
+            text_width=text_image.get_width(),
+        )
+        # merging images
+        image.blit(text_image, text_position)
+
         position = constants.PVP_BUTTON_POSITION
         super().__init__(position=position, screen=screen, image=image)
 
@@ -131,6 +151,22 @@ class PlayPVCButton(Button):
     def __init__(self, screen):
         # loading button image
         image = pygame.image.load("assets/Button.png")
+        # rendering image of text
+        text_image = get_text_image(
+            text="Play PVC",
+            text_size=constants.BUTTON_TEXT_SIZE,
+            text_color=constants.BUTTON_TEXT_COLOR,
+        )
+        # calculating positon of text on the button
+        text_position = calculate_positioning_in_the_middle_of_image(
+            image_height=image.get_height(),
+            image_width=image.get_width(),
+            text_height=text_image.get_height(),
+            text_width=text_image.get_width(),
+        )
+        # merging images
+        image.blit(text_image, text_position)
+
         position = constants.PVC_BUTTON_POSITION
         super().__init__(position=position, screen=screen, image=image)
 
@@ -139,6 +175,23 @@ class ExitStartScreenButton(Button):
     def __init__(self, screen):
         # loading button image
         image = pygame.image.load("assets/Button.png")
+
+        # rendering image of text
+        text_image = get_text_image(
+            text="Exit Game",
+            text_size=constants.BUTTON_TEXT_SIZE,
+            text_color=constants.BUTTON_TEXT_COLOR,
+        )
+        # calculating positon of text on the button
+        text_position = calculate_positioning_in_the_middle_of_image(
+            image_height=image.get_height(),
+            image_width=image.get_width(),
+            text_height=text_image.get_height(),
+            text_width=text_image.get_width(),
+        )
+        # merging images
+        image.blit(text_image, text_position)
+
         position = constants.START_SCREEN_EXIT_BUTTON_POSITION
         super().__init__(position=position, screen=screen, image=image)
 
@@ -147,6 +200,23 @@ class ExitEndScreenButton(Button):
     def __init__(self, screen):
         # loading button image
         image = pygame.image.load("assets/Button.png")
+
+        # rendering image of text
+        text_image = get_text_image(
+            text="Exit Game",
+            text_size=constants.BUTTON_TEXT_SIZE,
+            text_color=constants.BUTTON_TEXT_COLOR,
+        )
+        # calculating positon of text on the button
+        text_position = calculate_positioning_in_the_middle_of_image(
+            image_height=image.get_height(),
+            image_width=image.get_width(),
+            text_height=text_image.get_height(),
+            text_width=text_image.get_width(),
+        )
+        # merging images
+        image.blit(text_image, text_position)
+
         position = constants.END_SCREEN_EXIT_BUTTON_POSITION
         super().__init__(position=position, screen=screen, image=image)
 
@@ -155,5 +225,22 @@ class ReplayButton(Button):
     def __init__(self, screen):
         # loading button image
         image = pygame.image.load("assets/Button.png")
+
+        # rendering image of text
+        text_image = get_text_image(
+            text="Replay Game",
+            text_size=constants.BUTTON_TEXT_SIZE,
+            text_color=constants.BUTTON_TEXT_COLOR,
+        )
+        # calculating positon of text on the button
+        text_position = calculate_positioning_in_the_middle_of_image(
+            image_height=image.get_height(),
+            image_width=image.get_width(),
+            text_height=text_image.get_height(),
+            text_width=text_image.get_width(),
+        )
+        # merging images
+        image.blit(text_image, text_position)
+
         position = constants.REPLAY_BUTTON_POSITION
         super().__init__(position=position, screen=screen, image=image)
