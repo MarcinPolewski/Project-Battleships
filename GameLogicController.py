@@ -20,6 +20,7 @@ class GameLogicController:
         self._board_width = board_width
         self._ship_configuration = ship_configuration
 
+        self._game_is_running = True
         self._gamemode = None
         self._player1 = None
         self._player2 = None
@@ -53,6 +54,10 @@ class GameLogicController:
     @property
     def player_attacked(self):
         return self._player_attacked
+
+    @property
+    def game_is_running(self):
+        return self._game_is_running
 
     def switch_current_player(self):
         """handles switching users in PVP"""
@@ -210,3 +215,6 @@ class GameLogicController:
         """method trigger when user has clicked on enemys board"""
         if self._phase == constants.GAME_PHASE:
             self.play_game_phase(row, column)
+
+    def exit_game(self):
+        self._game_is_running = False

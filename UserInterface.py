@@ -366,9 +366,8 @@ def main():
     screen_handler = ScreenHandler(screen=game_screen, game_controller=game_controller)
     button_handler = ButtonHandler(screen=game_screen, game_controller=game_controller)
 
-    # main game loop, checks for events
-    game_is_running = True
-    while game_is_running:
+    # main game loop, checks for event
+    while game_controller.game_is_running:
         # setting frames per second
         clock.tick(constants.FPS)
 
@@ -387,7 +386,7 @@ def main():
         # EVENT HANDLER
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                game_is_running = False
+                game_controller.exit_game()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 input_handler.mouse_button_interaction(
                     mouse_position=pygame.mouse.get_pos(), is_pressed=True
