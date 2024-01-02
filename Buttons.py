@@ -1,4 +1,5 @@
 import pygame
+import constants
 
 
 class Button:
@@ -16,11 +17,12 @@ class Button:
     :type _is_displayed: bool
     """
 
-    def __init__(self, position, height, width, image):
+    def __init__(self, position, screen, image):
         self._position = position
-        self._height = height
-        self._width = width
+        self._height = image.get_height()
+        self._width = image.get_width()
         self._image = image
+        self._screen = screen
 
         self._is_visible = False
 
@@ -54,24 +56,46 @@ class Button:
             return True
         return False
 
+    def draw(self):
+        """draws button on the screen"""
+        self._screen.blit(self._image, self._position)
+
 
 class PlayPVPButton(Button):
-    def __init__(self, position):
+    def __init__(self, screen):
         # loading button image
         image = pygame.image.load("assets/Button.png")
-        # calculating dimensions from image
-        height = self._image.get_height()
-        width = self._image.get_width()
-        super().__init__(position=position, height=height, width=width, image=image)
+        position = constants.PVP_BUTTON_POSITION
+        super().__init__(position=position, screen=screen, image=image)
 
 
-# class PlayPVCButton(Button):
-#     pass
+class PlayPVCButton(Button):
+    def __init__(self, screen):
+        # loading button image
+        image = pygame.image.load("assets/Button.png")
+        position = constants.PVC_BUTTON_POSITION
+        super().__init__(position=position, screen=screen, image=image)
 
 
-# class ExitButton(Button):
-#     pass
+class ExitStartScreenButton(Button):
+    def __init__(self, screen):
+        # loading button image
+        image = pygame.image.load("assets/Button.png")
+        position = constants.START_SCREEN_EXIT_BUTTON_POSITION
+        super().__init__(position=position, screen=screen, image=image)
 
 
-# class ReplayButton(Button):
-#     pass
+class ExitEndScreenButton(Button):
+    def __init__(self, screen):
+        # loading button image
+        image = pygame.image.load("assets/Button.png")
+        position = constants.END_SCREEN_EXIT_BUTTON_POSITION
+        super().__init__(position=position, screen=screen, image=image)
+
+
+class ReplayButton(Button):
+    def __init__(self, screen):
+        # loading button image
+        image = pygame.image.load("assets/Button.png")
+        position = constants.REPLAY_BUTTON_POSITION
+        super().__init__(position=position, screen=screen, image=image)

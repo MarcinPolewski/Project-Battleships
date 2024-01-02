@@ -9,6 +9,14 @@ from BoardPositionCalculations import (
     calculate_x_y_cooridantes,
 )
 
+from Buttons import (
+    PlayPVPButton,
+    PlayPVCButton,
+    ExitStartScreenButton,
+    ExitEndScreenButton,
+    ReplayButton,
+)
+
 
 class ScreenHandler:
     """handles background animations, tables and buttons"""
@@ -88,6 +96,46 @@ class ScreenHandler:
             # @TODO write winner on screen
             # @TODO draw buttons
             pass
+
+
+class ButtonHandler:
+    def __init__(self, screen, game_controller):
+        self._screen = screen
+        self._game_controller = game_controller
+
+        # initialsing buttons for start screen
+        self._start_buttons = [
+            PlayPVPButton(screen=screen),
+            PlayPVCButton(screen=screen),
+            ExitStartScreenButton(screen=screen),
+        ]
+        # initialising buttons for end game screen
+        self._end_buttons = [
+            ReplayButton(screen=screen),
+            ExitEndScreenButton(screen=screen),
+        ]
+
+        self._buttons_to_draw = []
+
+    @property
+    def phase(self):
+        return self._game_controller.phase
+
+    def update(self):
+        """sets visibility of buttons according to
+        current phase"""
+        if self.phase == constants.GAME_START_SCREEN:
+            self._buttons_to_draw = self._start_buttons
+        elif self.phase == constants.GAME_RESULT_PHASE:
+            self._buttons_to_draw = self._end_buttons
+
+    def draw(self):
+        """draws right buttons on screen"""
+        if not self._buttons_to_draw:
+            return
+
+        for button in self._buttons_to_draw:
+            button.draw()
 
 
 class Visualizer:
@@ -316,9 +364,7 @@ def main():
     input_handler = InputHandler(game_controller)
     visualizer = Visualizer(screen=game_screen, game_controller=game_controller)
     screen_handler = ScreenHandler(screen=game_screen, game_controller=game_controller)
-
-    # @TODO delete, only for testing
-    game_controller.game_mode_selected(gamemode=constants.PVC)
+    button_handler = ButtonHandler(screen=game_screen, game_controller=game_controller)
 
     # main game loop, checks for events
     game_is_running = True
@@ -342,10 +388,12 @@ def main():
         # UPDATE ELEMENTS
         screen_handler.update()
         visualizer.update()
+        button_handler.update()
 
         # DRAW ELEMENTS
         screen_handler.draw()
         visualizer.draw()
+        button_handler.draw()
 
         pygame.display.update()
 
