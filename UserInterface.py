@@ -229,7 +229,16 @@ class InputHandler:
         self._button_handler = button_handler
         self._mouse_press_start_column = None
         self._mouse_press_start_row = None
-        self._mouse_mouse_pressed_position = None
+        self._mouse_press_phase = None
+        self._mouse_press_position = None
+
+    @property
+    def phase(self):
+        return self._game_controller.phase
+
+    def did_phase_change(self):
+        """checks if phase has changed between mouse press and release"""
+        return self.phase != self._mouse_press_phase
 
     def players_board_pressed(self, mouse_position):
         """checks if players board was pressed. If so saves row and column
@@ -252,6 +261,10 @@ class InputHandler:
         user has selected cells in one line. If so triggers right GameLogicController method
         and return True. Else return False
         """
+
+        if self.did_phase_change():
+            return False
+
         try:
             row_and_column = calculate_row_and_column(
                 coordinates=mouse_position, from_left_table=True
@@ -307,11 +320,13 @@ class InputHandler:
         """checks if button was pressed, if so triggers right GameLogicController method
         and return True. Else returns False"""
 
-        self._mouse_pressed_position
+        if self.did_phase_change():
+            return False
 
+        # checking if mouse press and release have occured on button
         button = self._button_handler.check_button_press(
             mouse_press_position=mouse_position,
-            mouse_release_position=self._mouse_pressed_position,
+            mouse_release_position=self._mouse_press_position,
         )
 
         if button is None:
@@ -334,7 +349,9 @@ class InputHandler:
     def mouse_button_interaction(self, mouse_position, is_pressed):
         """method checks which interaction has been performed"""
         if is_pressed:  # mouse button has been pressed
-            self._mouse_pressed_position = mouse_position
+            self._mouse_press_position = mouse_position
+            self._mouse_press_phase = self.phase
+
             if self.end_blackscreen_phase_pressed():
                 pass
             elif self.players_board_pressed(mouse_position):
