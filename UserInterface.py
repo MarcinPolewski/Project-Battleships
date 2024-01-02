@@ -20,7 +20,7 @@ from Buttons import (
 
 
 class ScreenHandler:
-    """handles background animations and table images"""
+    """handles background, tables and logo"""
 
     def __init__(self, screen, game_controller):
         # loading background images
@@ -29,8 +29,11 @@ class ScreenHandler:
             temp = pygame.image.load(f"assets/see/background{i}.png")
             self._background_images.append(temp)
 
-        # loading table images
+        # loading table image
         self._table_image = pygame.image.load("assets/table/table.png")
+
+        # loading logo image
+        self._logo = pygame.image.load("assets/logo.png")
 
         self._screen = screen
         self._game_controller = game_controller
@@ -61,6 +64,9 @@ class ScreenHandler:
         """draws background on screen"""
         self._screen.blit(self._current_background, (0, 0))
 
+    def draw_logo(self):
+        self._screen.blit(self._logo, constants.LOGO_POSITION)
+
     def draw_tables(self):
         """draws tables on screen"""
         # drawing left table
@@ -84,9 +90,7 @@ class ScreenHandler:
         self.draw_backroung()
 
         if self.phase == constants.GAME_START_SCREEN:
-            # @TODO write title on screen
-            # @TODO draw buttons on screen
-            pass
+            self.draw_logo()
         elif self.phase in [constants.GAME_PHASE, constants.POSITIONING_PHASE]:
             self.draw_tables()
         elif self.phase == constants.BLACKSCREEN_PHASE:
@@ -95,12 +99,11 @@ class ScreenHandler:
 
         elif self.phase == constants.GAME_RESULT_PHASE:
             # @TODO write winner on screen
-            # @TODO draw buttons
             pass
 
 
 class Visualizer:
-    """handles visualising game situation on boards"""
+    """handles visualising game situation on boards/tables"""
 
     def __init__(self, screen, game_controller):
         self._screen = screen
