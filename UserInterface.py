@@ -396,18 +396,6 @@ def main():
                     mouse_position=pygame.mouse.get_pos(), is_pressed=False
                 )
 
-        # UPDATE ELEMENTS
-        screen_handler.update()
-        visualizer.update()
-        button_handler.update()
-
-        # DRAW ELEMENTS
-        screen_handler.draw()
-        visualizer.draw()
-        button_handler.draw()
-
-        pygame.display.update()
-
     pygame.quit()
 
 
