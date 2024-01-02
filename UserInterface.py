@@ -243,6 +243,10 @@ class InputHandler:
     def players_board_pressed(self, mouse_position):
         """checks if players board was pressed. If so saves row and column
         and returns True else False"""
+
+        if self.phase not in [constants.GAME_PHASE, constants.POSITIONING_PHASE]:
+            return False
+
         try:
             row_and_column = calculate_row_and_column(
                 coordinates=mouse_position, from_left_table=True
@@ -262,7 +266,9 @@ class InputHandler:
         and return True. Else return False
         """
 
-        if self.did_phase_change():
+        if self.did_phase_change() or (
+            self.phase not in [constants.GAME_PHASE, constants.POSITIONING_PHASE]
+        ):
             return False
 
         try:
@@ -295,6 +301,10 @@ class InputHandler:
     def enemys_board_pressed(self, mouse_position):
         """checks if enemy's board was pressed if so triggers right GameLogicController method
         and return True. Else returns False"""
+
+        if self.phase not in [constants.GAME_PHASE, constants.POSITIONING_PHASE]:
+            return False
+
         try:
             row_and_column = calculate_row_and_column(
                 coordinates=mouse_position, from_left_table=False
