@@ -180,27 +180,6 @@ class GameLogicController:
         pass
         # @TODO
 
-    def button_pressed(self, button_type):
-        """method triggers right method when particular button was pressed"""
-        # @FIXME nie trzeba dwa razy sprawdzać, juz kontroler patrzy
-        # jaka jest faza
-        if self._phase == constants.GAME_START_SCREEN:
-            if button_type == constants.PVP_BUTTON:
-                self.game_mode_selected(constants.PVP)
-            elif button_type == constants.PVC_BUTTON:
-                self.game_mode_selected(constants.PVC)
-        elif self._phase == constants.GAME_RESULT_PHASE:
-            if button_type == constants.PLAY_AGAIN_BUTTON:
-                # @TODO
-                pass
-            elif button_type == constants.QUIT_BUTTON:
-                # @TODO
-                pass
-
-        elif self._phase == constants.BLACKSCREEN_PHASE:
-            # switching users at computer, switch screens
-            pass
-
     def players_cells_selected(self, start_row, start_column, end_row, end_column):
         """method trigger when user has selected cells on his own(left) board"""
         if self._phase == constants.POSITIONING_PHASE:
