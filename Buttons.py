@@ -61,6 +61,64 @@ class Button:
         self._screen.blit(self._image, self._position)
 
 
+class ButtonHandler:
+    """displays buttons on screen and checks if they have been pressed"""
+
+    def __init__(self, screen, game_controller):
+        self._screen = screen
+        self._game_controller = game_controller
+
+        # initialsing buttons for start screen
+        self._start_buttons = [
+            PlayPVPButton(screen=screen),
+            PlayPVCButton(screen=screen),
+            ExitStartScreenButton(screen=screen),
+        ]
+        # initialising buttons for end game screen
+        self._end_buttons = [
+            ReplayButton(screen=screen),
+            ExitEndScreenButton(screen=screen),
+        ]
+
+        self._buttons_to_draw = []
+
+    @property
+    def phase(self):
+        """returns current game phase"""
+        return self._game_controller.phase
+
+    def check_button_press(self, mouse_press_position, mouse_release_position):
+        """if button was pressed returns corresponding button
+        else return None"""
+        # button was pressed if it's displayed and mouse was pressed and released on it
+
+        for button in self._buttons_to_draw:
+            if button.check_if_mouse_on_button(
+                mouse_press_position
+            ) and button.check_if_mouse_on_button(mouse_release_position):
+                return button
+
+        return None
+
+    def update(self):
+        """sets visibility of buttons according to
+        current phase"""
+        if self.phase == constants.GAME_START_SCREEN:
+            self._buttons_to_draw = self._start_buttons
+        elif self.phase == constants.GAME_RESULT_PHASE:
+            self._buttons_to_draw = self._end_buttons
+        else:
+            self._buttons_to_draw = []
+
+    def draw(self):
+        """draws right buttons on screen"""
+        if not self._buttons_to_draw:
+            return
+
+        for button in self._buttons_to_draw:
+            button.draw()
+
+
 class PlayPVPButton(Button):
     def __init__(self, screen):
         # loading button image
