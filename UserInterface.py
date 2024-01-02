@@ -19,7 +19,7 @@ from Buttons import (
 
 
 class ScreenHandler:
-    """handles background animations, tables and buttons"""
+    """handles background animations and table images"""
 
     def __init__(self, screen, game_controller):
         # loading background images
@@ -99,6 +99,8 @@ class ScreenHandler:
 
 
 class ButtonHandler:
+    """displays buttons on screen and checks if they have been pressed"""
+
     def __init__(self, screen, game_controller):
         self._screen = screen
         self._game_controller = game_controller
@@ -119,7 +121,21 @@ class ButtonHandler:
 
     @property
     def phase(self):
+        """returns current game phase"""
         return self._game_controller.phase
+
+    def check_button_press(self, mouse_press_position, mouse_release_position):
+        """if button was pressed returns corresponding button
+        else return None"""
+        # button was pressed if it's displayed and mouse was pressed and released on it
+
+        for button in self._buttons_to_draw:
+            if button.check_if_mouse_on_button(
+                mouse_press_position
+            ) and button.check_if_mouse_on_button(mouse_release_position):
+                return button
+
+        return None
 
     def update(self):
         """sets visibility of buttons according to
@@ -128,6 +144,8 @@ class ButtonHandler:
             self._buttons_to_draw = self._start_buttons
         elif self.phase == constants.GAME_RESULT_PHASE:
             self._buttons_to_draw = self._end_buttons
+        else:
+            self._buttons_to_draw = []
 
     def draw(self):
         """draws right buttons on screen"""
@@ -241,10 +259,12 @@ class InputHandler:
     so mouse_button_interaction does not have to check further
     """
 
-    def __init__(self, game_controller):
+    def __init__(self, game_controller, button_handler):
         self._game_controller = game_controller
+        self._button_handler = button_handler
         self._mouse_press_start_column = None
         self._mouse_press_start_row = None
+        self._mouse_mouse_pressed_position = None
 
     def players_board_pressed(self, mouse_position):
         """checks if players board was pressed. If so saves row and column
@@ -321,25 +341,36 @@ class InputHandler:
     def button_was_pressed(self, mouse_position):
         """checks if button was pressed, if so triggers right GameLogicController method
         and return True. Else returns False"""
-        if self._game_controller.phase == constants.GAME_START_SCREEN:
-            # PVP and PVC buttons are displayed
-            pass
-        elif self._game_controller.phase == constants.BLACKSCREEN_PHASE:
-            # press anywhere to continue
-            pass
-        elif self._game_controller.phase == constants.GAME_RESULT_PHASE:
-            # quit and play again buttons are displayed
-            pass
 
-        # @TODO implement gamemode buttons
-        # @TODO impolement end screen buttons
+        self._mouse_pressed_position
+
+        button = self._button_handler.check_button_press(
+            mouse_press_position=mouse_position,
+            mouse_release_position=self._mouse_pressed_position,
+        )
+
+        if button is None:
+            return False
+        # calling right method
+        if isinstance(button, PlayPVPButton):
+            self._game_controller.game_mode_selected(constants.PVP)
+        elif isinstance(button, PlayPVCButton):
+            self._game_controller.game_mode_selected(constants.PVC)
+
+        elif isinstance(button, ExitStartScreenButton):
+            self._game_controller.exit_game()
+        elif isinstance(button, ExitEndScreenButton):
+            self._game_controller.exit_game()
+        elif isinstance(button, ReplayButton):
+            pass  # @TODO how to restart game??? game_controller.__init__() ???
+
+        return True
 
     def mouse_button_interaction(self, mouse_position, is_pressed):
         """method checks which interaction has been performed"""
         if is_pressed:  # mouse button has been pressed
+            self._mouse_pressed_position = mouse_position
             if self.end_blackscreen_phase_pressed():
-                pass
-            elif self.button_was_pressed(mouse_position):
                 pass
             elif self.players_board_pressed(mouse_position):
                 pass
@@ -347,6 +378,8 @@ class InputHandler:
                 pass
         else:  # mouse button has been released
             if self.players_board_released(mouse_position):
+                pass
+            elif self.button_was_pressed(mouse_position):
                 pass
 
 
@@ -360,11 +393,14 @@ def main():
     )
     pygame.display.set_caption("Battleships")
 
+    # initializing controllers
     game_controller = GameLogicController()
-    input_handler = InputHandler(game_controller)
     visualizer = Visualizer(screen=game_screen, game_controller=game_controller)
     screen_handler = ScreenHandler(screen=game_screen, game_controller=game_controller)
     button_handler = ButtonHandler(screen=game_screen, game_controller=game_controller)
+    input_handler = InputHandler(
+        game_controller=game_controller, button_handler=button_handler
+    )
 
     # main game loop, checks for event
     while game_controller.game_is_running:
