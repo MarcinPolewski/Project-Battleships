@@ -372,6 +372,18 @@ def main():
         # setting frames per second
         clock.tick(constants.FPS)
 
+        # UPDATE ELEMENTS
+        screen_handler.update()
+        visualizer.update()
+        button_handler.update()
+
+        # DRAW ELEMENTS
+        screen_handler.draw()
+        visualizer.draw()
+        button_handler.draw()
+
+        pygame.display.update()
+
         # EVENT HANDLER
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
