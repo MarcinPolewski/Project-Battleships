@@ -18,3 +18,14 @@ def calculate_positioning_in_the_middle_of_image(
     x = (image_width - text_width) // 2
 
     return (x, y)
+
+
+def calculate_text_position_for_logo(
+    image_height, image_width, text_height, text_width
+):
+    """logo image is divided horizonatally to 2 equal rectangles,
+    where lower on is ship image and top one is text"""
+    # @TODO handle situation where x or y is negative
+    y = ((image_height) // 2 - text_height) // 2
+    x = (image_width - text_width) // 2
+    return (x, y)

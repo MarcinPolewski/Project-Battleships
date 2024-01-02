@@ -17,6 +17,7 @@ from Buttons import (
     ReplayButton,
     ButtonHandler,
 )
+from TextImageGenerator import get_text_image, calculate_text_position_for_logo
 
 
 class ScreenHandler:
@@ -33,7 +34,23 @@ class ScreenHandler:
         self._table_image = pygame.image.load("assets/table/table.png")
 
         # loading logo image
-        self._logo = pygame.image.load("assets/logo.png")
+        self._logo = pygame.image.load("assets/Logo.png")
+        # generating text image for logo
+        logo_text_image = get_text_image(
+            text="Battleship",
+            text_size=constants.LOGO_TEXT_SIZE,
+            text_color=(255, 0, 0),
+        )
+        # calculating position of text on logo
+        logo_text_position = calculate_text_position_for_logo(
+            image_height=self._logo.get_height(),
+            image_width=self._logo.get_width(),
+            text_height=logo_text_image.get_height(),
+            text_width=logo_text_image.get_width(),
+        )
+
+        # mergin logo and logo_text
+        self._logo.blit(logo_text_image, logo_text_position)
 
         self._screen = screen
         self._game_controller = game_controller

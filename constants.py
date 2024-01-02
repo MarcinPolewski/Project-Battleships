@@ -76,3 +76,4 @@ LOGO_POSITION = (500, 100)
 # button text settings
 BUTTON_TEXT_SIZE = 40
 BUTTON_TEXT_COLOR = (0, 0, 0)
+LOGO_TEXT_SIZE = 60
