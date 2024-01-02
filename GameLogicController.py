@@ -27,6 +27,7 @@ class GameLogicController:
         self._current_player = None
         self._player_attacked = None
 
+        self._phase_to_return = constants.POSITIONING_PHASE
         self._phase = constants.GAME_START_SCREEN
 
         self._winner = None
@@ -134,6 +135,7 @@ class GameLogicController:
         # switch phase if all players have placed ships
         if (not self._player1.ships_to_place) and (not self._player2.ships_to_place):
             self._phase = constants.GAME_PHASE
+            self._phase_to_return = constants.GAME_PHASE
             return
 
         # current player has placed all the ships and other player has not
@@ -173,7 +175,7 @@ class GameLogicController:
     def exit_black_screen_phase(self):
         """method trigged when user have switch in real world
         and current user is ready to proceed"""
-        self._phase = constants.GAME_PHASE
+        self._phase = self._phase_to_return
 
     def game_result_phase(self, mouse_was_pressed, mouse_was_released, mouse_position):
         """method handles end of the game phase"""

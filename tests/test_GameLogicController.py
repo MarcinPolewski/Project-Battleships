@@ -300,12 +300,17 @@ def test_position_ship_phase_PVP(monkeypatch):
             board_cell = players2_board[row_idx, column_idx]
             assert board_cell.is_free
 
-    # testing if current player has changes
+    # testing if player2 has ships to place
+    assert len(controller.player2.ships_to_place) == 1
+    assert len(controller.player1.ships_to_place) == 0
+
+    # testing if current player has changed
     assert controller.current_player == controller.player2
     assert controller.player_attacked == controller.player1
     assert controller.phase == constants.BLACKSCREEN_PHASE
 
     controller.exit_black_screen_phase()
+    assert controller.phase == constants.POSITIONING_PHASE
 
     controller.position_ships_phase(
         start_row=0, start_column=9, end_column=9, end_row=4
