@@ -181,6 +181,8 @@ class Player:
         """
         cell = self._board[coordinate_y, coordinate_x]
         attack_status = cell.handle_attack()
+        if attack_status == constants.SHIP_SUNK:
+            self._fleet.remove(cell.ship_handle)
         return attack_status
 
     def perform_attack(self, opponent, target_x, target_y):
