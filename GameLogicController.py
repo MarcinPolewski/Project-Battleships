@@ -162,6 +162,14 @@ class GameLogicController:
             self._prompts.append("Already shot here, try elsewhere")
             return
 
+        # prompting user attack status
+        if attack_status == constants.SHIP_HIT:
+            self._prompts.append("Hit!")
+        elif attack_status == constants.ATTACK_UNSUCCESSFUL:
+            self._prompts.append("Miss!")
+        elif attack_status == constants.SHIP_SUNK:
+            self._prompts.append("Ship down!")
+
         # check if game is won
         if self._player1.is_defeated:
             # player 2 has won
