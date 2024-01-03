@@ -17,7 +17,11 @@ from Buttons import (
     ReplayButton,
     ButtonHandler,
 )
-from TextImageGenerator import get_text_image, calculate_text_position_for_logo
+from TextImageGenerator import (
+    get_text_image,
+    calculate_text_position_for_logo,
+    calculate_positioning_in_the_middle_of_image,
+)
 
 
 class ScreenHandler:
@@ -134,6 +138,87 @@ class ScreenHandler:
         elif self.phase == constants.GAME_RESULT_PHASE:
             # @TODO write winner on screen
             pass
+
+
+class StatusBarHandler:
+    """class handles displaying information of status bar
+    during poitioning it's which ships to posiion"""
+
+    pass
+
+
+class Prompt(pygame.sprite.Sprite):
+    def __init__(self, screen, prompt_text):
+        pygame.sprite.Sprite.__init__(self)
+        self._prompt_text = prompt_text
+        self._screen = screen
+        self._alpha = 255
+        self._last_update_time = pygame.time.get_ticks()
+
+        # @TODO? make dependent on length of prompts
+        self._cooldown = constants.PROMPT_COOLDOWN
+
+        # create prompt image
+        self._image = get_text_image(
+            text=prompt_text,
+            text_size=constants.PROMPT_TEXT_SIZE,
+            text_color=constants.PROMPT_COLOR,
+        )
+        # calculate prompt position in the middle of screen
+        self._position = calculate_positioning_in_the_middle_of_image(
+            image_height=constants.SCREEN_HEIGHT,
+            image_width=constants.SCREEN_WIDTH,
+            text_height=self._image.get_height(),
+            text_width=self._image.get_width(),
+        )
+
+    def update(self):
+        """if enough time has passed updates fade of image or removes itself
+        from list if it's gone"""
+        current_time = pygame.time.get_ticks()
+        if current_time - self._last_update_time >= self._cooldown:
+            self._alpha -= 10
+            self._last_update_time = current_time
+            if self._alpha <= 0:
+                # remove prompt from sprite list
+                self.kill()
+            self._image.set_alpha(self._alpha)
+
+    def draw(self):
+        """draw prompt on screen"""
+        self._screen.blit(self._image, self._position)
+        pass
+
+
+class PromptHandler:
+    """reads fetches propts from game controller,
+    creates instance of Prompt and updates all currently visible prompts
+
+    prompts user at the beginning of phase on what to do
+    """
+
+    def __init__(self, screen, game_controller):
+        self._game_controller = game_controller
+        self._screen = screen
+        self._active_prompts = pygame.sprite.Group()
+
+    def update(self):
+        """checks if there are new prompts and updated previous ones"""
+        fetched_prompt = self._game_controller.fetch_prompt()
+        if fetched_prompt is not None:
+            # create instance of Prompt class and add to list
+            prompt = Prompt(screen=self._screen, prompt_text=fetched_prompt)
+            self._active_prompts.add([prompt])
+        # udpate existing prompts
+        # self._active_prompts.update()
+        for prompt in self._active_prompts:
+            prompt.update()
+
+    def draw(self):
+        """draws prommpts on screen"""
+        for prompt in self._active_prompts:
+            prompt.draw()
+        # self._active_prompts.draw(surface=self._screen)
 
 
 class Visualizer:
@@ -407,6 +492,7 @@ def main():
     visualizer = Visualizer(screen=game_screen, game_controller=game_controller)
     screen_handler = ScreenHandler(screen=game_screen, game_controller=game_controller)
     button_handler = ButtonHandler(screen=game_screen, game_controller=game_controller)
+    prompt_handler = PromptHandler(screen=game_screen, game_controller=game_controller)
     input_handler = InputHandler(
         game_controller=game_controller, button_handler=button_handler
     )
@@ -420,11 +506,13 @@ def main():
         screen_handler.update()
         visualizer.update()
         button_handler.update()
+        prompt_handler.update()
 
         # DRAW ELEMENTS
         screen_handler.draw()
         visualizer.draw()
         button_handler.draw()
+        prompt_handler.draw()
 
         pygame.display.update()
 

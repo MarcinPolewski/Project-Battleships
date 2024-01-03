@@ -67,7 +67,7 @@ class GameLogicController:
         or returns None if there are none."""
         if not self._prompts:
             return None
-        prompt = self._promptss[0]
+        prompt = self._prompts[0]
         self._prompts.remove(prompt)
         return prompt
 
@@ -130,10 +130,8 @@ class GameLogicController:
                 min(start_row, end_row),
             )
         except NotSuchShipToPlaceError:
-            # @TODO add prompting user
             self._prompts.append("Not such ship to place")
         except ShipPlacingError:
-            # @TODO add prompting user
             self._prompts.append("Cannot place ship here")
 
     def position_ships_phase(self, start_row, start_column, end_row, end_column):

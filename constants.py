@@ -22,9 +22,9 @@ SHIP_VERTICAL = 2
 # game configurations
 STANDARD_SHIP_QUANTITIES = {
     "Carrier": 1,
-    "Battleship": 1,
-    "Cruiser": 4,
-    "PatrolShip": 3,
+    # "Battleship": 1,
+    # "Cruiser": 4,
+    # "PatrolShip": 3,
 }
 
 # table configurations
@@ -47,8 +47,8 @@ SCREEN_HEIGHT = 900
 
 # screen positioning
 TABLE_HORIZONTAL_OFFSET = 150
-TABLE_VERTICAL_OFFSET = 100
-TABLE_SIZE = 600  # board is  600pxx600px
+TABLE_VERTICAL_OFFSET = 150
+TABLE_SIZE = 600  # board is  600px x 600px
 CELL_SIZE = 60  # each cell of table is 60px x 60px
 
 FPS = 60
@@ -71,6 +71,8 @@ START_SCREEN_EXIT_BUTTON_POSITION = (600, 700)
 END_SCREEN_EXIT_BUTTON_POSITION = (100, 100)
 REPLAY_BUTTON_POSITION = (200, 200)
 
+SWITCH_USER_BUTTON_POSITION = (600, 700)
+
 LOGO_POSITION = (500, 100)
 
 # button text settings
@@ -78,3 +80,7 @@ BUTTON_TEXT_SIZE = 40
 BUTTON_TEXT_COLOR = (0, 0, 0)
 LOGO_TEXT_SIZE = 60
 MESSAGE_TO_SWITCH_FONT_SIZE = 40
+
+PROMPT_TEXT_SIZE = 50
+PROMPT_COLOR = (255, 0, 0)
+PROMPT_COOLDOWN = 30
