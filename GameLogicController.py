@@ -1,6 +1,6 @@
 import constants
 from Player import Player, BotPlayer
-from GameErrors import NotSuchShipToPlaceError, ShipPlacingError
+from GameErrors import NotSuchShipToPlaceError, ShipPlacingError, CellAlreadyShotError
 
 
 # @TODO delete, only for testing
@@ -29,6 +29,8 @@ class GameLogicController:
 
         self._phase_to_return = constants.POSITIONING_PHASE
         self._phase = constants.GAME_START_SCREEN
+
+        self._prompts = []
 
         self._winner = None
 
@@ -59,6 +61,15 @@ class GameLogicController:
     @property
     def game_is_running(self):
         return self._game_is_running
+
+    def fetch_prompt(self):
+        """returns propt to display and removes it from queue
+        or returns None if there are none."""
+        if not self._prompts:
+            return None
+        prompt = self._promptss[0]
+        self._prompts.remove(prompt)
+        return prompt
 
     def switch_current_player(self):
         """handles switching users in PVP"""
@@ -119,11 +130,11 @@ class GameLogicController:
                 min(start_row, end_row),
             )
         except NotSuchShipToPlaceError:
-            pass
             # @TODO add prompting user
+            self._prompts.append("Not such ship to place")
         except ShipPlacingError:
-            pass
             # @TODO add prompting user
+            self._prompts.append("Cannot place ship here")
 
     def position_ships_phase(self, start_row, start_column, end_row, end_column):
         """handles game positioning phase"""
@@ -147,11 +158,15 @@ class GameLogicController:
     def play_game_phase(self, shot_row, shot_column):
         """handles main game phase(when player(s) shoot)"""
         # current player performs attack
-        self._current_player.perform_attack(
-            opponent=self._player_attacked,
-            target_x=shot_column,
-            target_y=shot_row,
-        )
+        try:
+            self._current_player.perform_attack(
+                opponent=self._player_attacked,
+                target_x=shot_column,
+                target_y=shot_row,
+            )
+        except CellAlreadyShotError:
+            self._prompts.append("Already shot here, try elsewhere")
+            return
 
         # check if game is won
         if self._player1.is_defeated:
