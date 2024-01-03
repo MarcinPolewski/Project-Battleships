@@ -145,7 +145,83 @@ class StatusBarHandler:
     """class handles displaying information of status bar
     during poitioning it's which ships to posiion"""
 
-    pass
+    def __init__(self, screen, game_controller):
+        self._screen = screen
+        self._game_controller = game_controller
+
+        # load background
+        self._background = pygame.image.load("assets/StatusBar.png")
+
+        # load small ship icon
+        self._small_ship_icon = pygame.image.load("assets/ships/SmallShipIcon.png")
+
+    @property
+    def phase(self):
+        return self._game_controller.phase
+
+    def update(self):
+        # check if fleet state has changes
+        pass
+
+    def draw_help_message(self):
+        pass
+
+    def draw_background(self):
+        self._screen.blit(self._background, (0, 0))
+
+    def draw_fleet_of_player(self, player, on_the_left):
+        # start drawing over corresponding table and end 600 px
+        x = constants.TABLE_HORIZONTAL_OFFSET
+        y = constants.FLEET_STATUS_OFFSET
+        if not on_the_left:
+            x += (
+                constants.SCREEN_WIDTH
+                - constants.TABLE_SIZE
+                - constants.TABLE_HORIZONTAL_OFFSET
+            )
+
+        for ship_name in constants.STANDARD_SHIP_QUANTITIES:
+            quantity = constants.STANDARD_SHIP_QUANTITIES[ship_name]
+            length = constants.SHIP_LENGTHS[ship_name]
+
+            # drawing ship
+            for i in range(length):
+                self._screen.blit(self._small_ship_icon, (x, y))
+                x += constants.SMALL_SHIP_ICON_SIZE
+
+            # calculate status
+            ship_counter = 0
+            for ship in player.fleet:
+                if ship.length == length:
+                    ship_counter += 1
+
+            text = f"{ship_counter}/{quantity}"
+            text_image = get_text_image(
+                text=text,
+                text_size=constants.STATUS_BAR_FONT_SIZE,
+                text_color=constants.STATUS_BAR_TEXT_COLOR,
+            )
+            self._screen.blit(text_image, (x, y))
+
+            x += constants.SMALL_SHIP_ICON_SIZE * 2
+
+    def draw_fleet_status(self):
+        self.draw_fleet_of_player(
+            player=self._game_controller.current_player, on_the_left=True
+        )
+        self.draw_fleet_of_player(
+            player=self._game_controller.player_attacked, on_the_left=False
+        )
+
+    def draw(self):
+        if self.phase in [
+            constants.GAME_PHASE,
+            constants.POSITIONING_PHASE,
+            constants.READY_TO_SWITCH_PHASE,
+        ]:
+            self.draw_background()
+            self.draw_help_message()
+            self.draw_fleet_status()
 
 
 class Prompt(pygame.sprite.Sprite):
@@ -497,6 +573,9 @@ def main():
     screen_handler = ScreenHandler(screen=game_screen, game_controller=game_controller)
     button_handler = ButtonHandler(screen=game_screen, game_controller=game_controller)
     prompt_handler = PromptHandler(screen=game_screen, game_controller=game_controller)
+    status_bar_hanlder = StatusBarHandler(
+        screen=game_screen, game_controller=game_controller
+    )
     input_handler = InputHandler(
         game_controller=game_controller, button_handler=button_handler
     )
@@ -511,12 +590,14 @@ def main():
         visualizer.update()
         button_handler.update()
         prompt_handler.update()
+        status_bar_hanlder.update()
 
         # DRAW ELEMENTS
         screen_handler.draw()
         visualizer.draw()
         button_handler.draw()
         prompt_handler.draw()
+        status_bar_hanlder.draw()
 
         pygame.display.update()
 

@@ -11,7 +11,7 @@ PATROL_SHIP_LENGTH = 2
 SHIP_LENGTHS = {
     "Carrier": CARRIER_LENGTH,
     "Battleship": BATTLESHIP_LENGTH,
-    "Cruiser": CARRIER_LENGTH,
+    "Cruiser": CRUISER_LENGTH,
     "PatrolShip": PATROL_SHIP_LENGTH,
 }
 
@@ -22,9 +22,9 @@ SHIP_VERTICAL = 2
 # game configurations
 STANDARD_SHIP_QUANTITIES = {
     "Carrier": 1,
-    # "Battleship": 1,
-    # "Cruiser": 4,
-    # "PatrolShip": 3,
+    "Battleship": 1,
+    "Cruiser": 4,
+    "PatrolShip": 3,
 }
 
 # table configurations
@@ -85,3 +85,10 @@ MESSAGE_TO_SWITCH_FONT_SIZE = 40
 PROMPT_TEXT_SIZE = 50
 PROMPT_COLOR = (255, 0, 0)
 PROMPT_COOLDOWN = 30
+
+# Positioning on screen bar
+FLEET_STATUS_OFFSET = 50
+SMALL_SHIP_ICON_SIZE = 24  # in pixels
+
+STATUS_BAR_FONT_SIZE = 20
+STATUS_BAR_TEXT_COLOR = (0, 0, 0)
