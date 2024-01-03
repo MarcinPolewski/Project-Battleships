@@ -152,8 +152,9 @@ class GameLogicController:
     def play_game_phase(self, shot_row, shot_column):
         """handles main game phase(when player(s) shoot)"""
         # current player performs attack
+        attack_status = None
         try:
-            self._current_player.perform_attack(
+            attack_status = self._current_player.perform_attack(
                 opponent=self._player_attacked,
                 target_x=shot_column,
                 target_y=shot_row,
