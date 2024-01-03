@@ -160,7 +160,6 @@ class StatusBarHandler:
         return self._game_controller.phase
 
     def update(self):
-        # check if fleet state has changes
         pass
 
     def draw_help_message(self):
@@ -174,7 +173,7 @@ class StatusBarHandler:
         x = constants.TABLE_HORIZONTAL_OFFSET
         y = constants.FLEET_STATUS_OFFSET
         if not on_the_left:
-            x += (
+            x = (
                 constants.SCREEN_WIDTH
                 - constants.TABLE_SIZE
                 - constants.TABLE_HORIZONTAL_OFFSET
@@ -187,20 +186,25 @@ class StatusBarHandler:
             # drawing ship
             for i in range(length):
                 self._screen.blit(self._small_ship_icon, (x, y))
-                x += constants.SMALL_SHIP_ICON_SIZE
+                x += constants.SMALL_SHIP_ICON_SIZE - 4
+                # -4 to make images overlap = looks better
 
-            # calculate status
+            # calculate player's amount of this kind of ship
             ship_counter = 0
             for ship in player.fleet:
                 if ship.length == length:
                     ship_counter += 1
 
+            # generate text image
             text = f"{ship_counter}/{quantity}"
             text_image = get_text_image(
                 text=text,
                 text_size=constants.STATUS_BAR_FONT_SIZE,
                 text_color=constants.STATUS_BAR_TEXT_COLOR,
             )
+
+            x += 10
+
             self._screen.blit(text_image, (x, y))
 
             x += constants.SMALL_SHIP_ICON_SIZE * 2
