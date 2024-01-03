@@ -187,7 +187,6 @@ class Prompt(pygame.sprite.Sprite):
     def draw(self):
         """draw prompt on screen"""
         self._screen.blit(self._image, self._position)
-        pass
 
 
 class PromptHandler:
@@ -210,7 +209,6 @@ class PromptHandler:
             prompt = Prompt(screen=self._screen, prompt_text=fetched_prompt)
             self._active_prompts.add([prompt])
         # udpate existing prompts
-        # self._active_prompts.update()
         for prompt in self._active_prompts:
             prompt.update()
 
@@ -218,7 +216,6 @@ class PromptHandler:
         """draws prommpts on screen"""
         for prompt in self._active_prompts:
             prompt.draw()
-        # self._active_prompts.draw(surface=self._screen)
 
 
 class Visualizer:
@@ -364,9 +361,8 @@ class InputHandler:
 
     def players_board_released(self, mouse_position):
         """checks if mouse button was released on players board and if
-        user has selected cells in one line. If so triggers right GameLogicController method
-        and return True. Else return False
-        """
+        user has selected cells in one line. If so triggers right
+        GameLogicController method and return True. Else return False"""
 
         if self.did_phase_change() or (
             self.phase not in [constants.GAME_PHASE, constants.POSITIONING_PHASE]
@@ -401,8 +397,8 @@ class InputHandler:
             return False
 
     def enemys_board_pressed(self, mouse_position):
-        """checks if enemy's board was pressed if so triggers right GameLogicController method
-        and return True. Else returns False"""
+        """checks if enemy's board was pressed if so triggers right
+        GameLogicController method and return True. Else returns False"""
 
         if self.phase not in [constants.GAME_PHASE, constants.POSITIONING_PHASE]:
             return False
