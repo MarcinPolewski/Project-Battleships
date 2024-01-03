@@ -3,10 +3,6 @@ from Player import Player, BotPlayer
 from GameErrors import NotSuchShipToPlaceError, ShipPlacingError, CellAlreadyShotError
 
 
-# @TODO delete, only for testing
-from print_board_to_console import print_boards_to_console
-
-
 class GameLogicController:
     """handles logic of the game, turns, phases etc"""
 
