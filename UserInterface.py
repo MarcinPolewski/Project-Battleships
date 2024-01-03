@@ -233,7 +233,7 @@ class Visualizer:
 
         # loading ship images
         self._ship_images = []
-        for i in range(1, 5):
+        for i in range(1, 6):
             temp = pygame.image.load(f"assets/ships/Ship{i}.png")
             self._ship_images.append(temp)
 
