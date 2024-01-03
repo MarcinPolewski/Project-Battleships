@@ -16,6 +16,7 @@ from Buttons import (
     ExitEndScreenButton,
     ReplayButton,
     ButtonHandler,
+    SwitchUserButton,
 )
 from TextImageGenerator import (
     get_text_image,
@@ -130,14 +131,14 @@ class ScreenHandler:
 
         if self.phase == constants.GAME_START_SCREEN:
             self.draw_logo()
-        elif self.phase in [constants.GAME_PHASE, constants.POSITIONING_PHASE]:
+        elif self.phase in [
+            constants.GAME_PHASE,
+            constants.POSITIONING_PHASE,
+            constants.READY_TO_SWITCH_PHASE,
+        ]:
             self.draw_tables()
         elif self.phase == constants.BLACKSCREEN_PHASE:
             self.draw_message_to_switch()
-
-        elif self.phase == constants.GAME_RESULT_PHASE:
-            # @TODO write winner on screen
-            pass
 
 
 class StatusBarHandler:
@@ -307,7 +308,11 @@ class Visualizer:
 
     def draw(self):
         """draws current player's view on the board"""
-        if self.phase in [constants.GAME_PHASE, constants.POSITIONING_PHASE]:
+        if self.phase in [
+            constants.GAME_PHASE,
+            constants.POSITIONING_PHASE,
+            constants.READY_TO_SWITCH_PHASE,
+        ]:
             current_player = self._game_controller.current_player
             player_attacked = self._game_controller.player_attacked
             self.draw_one_player(player=current_player, for_left_table=True)
@@ -444,6 +449,9 @@ class InputHandler:
             self._game_controller.game_mode_selected(constants.PVP)
         elif isinstance(button, PlayPVCButton):
             self._game_controller.game_mode_selected(constants.PVC)
+
+        elif isinstance(button, SwitchUserButton):
+            self._game_controller.switch_current_player()
 
         elif isinstance(button, ExitStartScreenButton):
             self._game_controller.exit_game()

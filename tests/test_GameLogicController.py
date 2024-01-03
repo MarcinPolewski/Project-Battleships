@@ -370,6 +370,11 @@ def test_play_game_phase_PVP(monkeypatch):
     assert not controller.player1.board[0, 0].was_shot
     controller.play_game_phase(shot_row=0, shot_column=0)
     # phase and current player should change
+    assert controller.phase == constants.READY_TO_SWITCH_PHASE
+    assert controller.current_player == controller.player2
+
+    controller.switch_current_player()
+
     assert controller.phase == constants.BLACKSCREEN_PHASE
     assert controller.current_player == controller.player1
     # checking if attack was successful
@@ -380,6 +385,11 @@ def test_play_game_phase_PVP(monkeypatch):
     # player 1 is attacking
     assert not controller.player2.board[0, 9].was_shot
     controller.play_game_phase(shot_row=0, shot_column=9)
+
+    assert controller.phase == constants.READY_TO_SWITCH_PHASE
+    assert controller.current_player == controller.player1
+
+    controller.switch_current_player()
     # phase and current player should change
     assert controller.phase == constants.BLACKSCREEN_PHASE
     assert controller.current_player == controller.player2
@@ -426,10 +436,6 @@ def test_play_game_phase_PVC(monkeypatch):
 
 
 def test_game_result_phase(monkeypatch):
-    assert False
-
-
-def test_button_pressed(monkeypatch):
     assert False
 
 

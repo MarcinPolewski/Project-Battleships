@@ -165,11 +165,11 @@ class GameLogicController:
 
         # prompting user attack status
         if attack_status == constants.SHIP_HIT:
-            self._prompts.append("Hit!")
+            self._prompts.append("You hit!")
         elif attack_status == constants.ATTACK_UNSUCCESSFUL:
-            self._prompts.append("Miss!")
+            self._prompts.append("You missed!")
         elif attack_status == constants.SHIP_SUNK:
-            self._prompts.append("Ship down!")
+            self._prompts.append("You have shot down ship!")
 
         # check if game is won
         if self._player1.is_defeated:
@@ -185,7 +185,7 @@ class GameLogicController:
 
         # swithcing current player or computer attacks
         if self._gamemode == constants.PVP:
-            self.switch_current_player()
+            self._phase = constants.READY_TO_SWITCH_PHASE
         else:
             # computer performs attack
             self._player2.perform_attack(self._player1)

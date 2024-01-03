@@ -83,6 +83,8 @@ class ButtonHandler:
             ReplayButton(screen=screen),
             ExitEndScreenButton(screen=screen),
         ]
+        # initialisinng button for switching users
+        self._ready_to_switch_button = [SwitchUserButton(screen=screen)]
 
         self._buttons_to_draw = []
 
@@ -109,6 +111,8 @@ class ButtonHandler:
         current phase"""
         if self.phase == constants.GAME_START_SCREEN:
             self._buttons_to_draw = self._start_buttons
+        elif self.phase == constants.READY_TO_SWITCH_PHASE:
+            self._buttons_to_draw = self._ready_to_switch_button
         elif self.phase == constants.GAME_RESULT_PHASE:
             self._buttons_to_draw = self._end_buttons
         else:
