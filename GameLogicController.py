@@ -31,7 +31,7 @@ class GameLogicController:
         self._prompts = []
 
         # variables for statistics
-        self._game_start_time = 0
+        self._game_start_time = pygame.time.get_ticks()
         self._game_play_time = timedelta(milliseconds=0)
         self._rounds_played = 0
         self._winner = None
@@ -65,13 +65,51 @@ class GameLogicController:
         return self._winner
 
     @property
+    def winner_name(self):
+        if self._winner is None:
+            return None
+
+        if self._gamemode == constants.PVP:
+            if self._winner == self._player1:
+                return "Player1"
+            else:
+                return "Player2"
+        else:
+            if self._winner == self._player1:
+                return "Player"
+            else:
+                return "Bot"
+
+    @property
     def game_play_time(self):
         """returns timedelta object with time spend on playing game"""
         if self._phase == constants.GAME_RESULT_PHASE:
             return timedelta(milliseconds=self._game_play_time)
 
-        time = self._game_start_time - pygame.time.get_ticks()
+        time = pygame.time.get_ticks() - self._game_start_time
         return timedelta(milliseconds=time)
+
+    def get_play_time_as_str(self):
+        time_played = int(self.game_play_time.total_seconds())
+        minutes, seconds = divmod(time_played, 60)
+        hours, minutes = divmod(minutes, 60)
+
+        output_text = ""
+        if hours != 0:
+            if hours == 1:
+                output_text += str(hours) + " hour, "
+            else:
+                output_text += str(hours) + " hours, "
+        if minutes != 0:
+            if minutes == 1:
+                output_text += str(minutes) + " minute, "
+            else:
+                output_text += str(minutes) + " minutes, "
+        if seconds == 1:
+            output_text += str(seconds) + " second"
+        else:
+            output_text += str(seconds) + " seconds"
+        return output_text
 
     def get_player_names(self):
         """returns tuple of (current players name, opponent name)
@@ -235,7 +273,7 @@ class GameLogicController:
         # check if current player has won
         if self._player_attacked.is_defeated:
             # current player has won
-            self._game_play_time = self._game_start_time - pygame.time.get_ticks()
+            self._game_play_time = pygame.time.get_ticks() - self._game_start_time
             self._winner = self._current_player
             self._phase = constants.GAME_RESULT_PHASE
             return
@@ -260,7 +298,7 @@ class GameLogicController:
             if self._current_player.is_defeated:
                 self._winner = self._player2
                 self._phase = constants.GAME_RESULT_PHASE
-                self._game_play_time = self._game_start_time - pygame.time.get_ticks()
+                self._game_play_time = pygame.time.get_ticks() - self._game_start_time
                 return
 
     def exit_black_screen_phase(self):

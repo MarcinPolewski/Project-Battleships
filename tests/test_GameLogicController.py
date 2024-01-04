@@ -2,7 +2,7 @@ from GameLogicController import GameLogicController
 import constants
 from Player import Player, BotPlayer
 from GameErrors import NotSuchShipToPlaceError
-
+from datetime import timedelta
 import pytest
 
 
@@ -536,6 +536,30 @@ def test_calculate_players_alive_segments(monkeypatch):
 
     assert game_controller.calculate_players_alive_segments(player1) == 4
     assert game_controller.calculate_players_alive_segments(player2) == 4
+
+
+def test_get_play_time_as_str(monkeypatch):
+    game_controller = GameLogicController()
+
+    time = timedelta(seconds=90)
+    monkeypatch.setattr("GameLogicController.GameLogicController.game_play_time", time)
+    assert game_controller.get_play_time_as_str() == "1 minute, 30 seconds"
+
+    time = timedelta(seconds=1)
+    monkeypatch.setattr("GameLogicController.GameLogicController.game_play_time", time)
+    assert game_controller.get_play_time_as_str() == "1 second"
+
+    time = timedelta(seconds=60)
+    monkeypatch.setattr("GameLogicController.GameLogicController.game_play_time", time)
+    assert game_controller.get_play_time_as_str() == "1 minute, 0 seconds"
+
+    time = timedelta(hours=1, minutes=1, seconds=1)
+    monkeypatch.setattr("GameLogicController.GameLogicController.game_play_time", time)
+    assert game_controller.get_play_time_as_str() == "1 hour, 1 minute, 1 second"
+
+    time = timedelta(hours=3, minutes=3, seconds=3)
+    monkeypatch.setattr("GameLogicController.GameLogicController.game_play_time", time)
+    assert game_controller.get_play_time_as_str() == "3 hours, 3 minutes, 3 seconds"
 
 
 def test_players_cells_selected(monkeypatch):
