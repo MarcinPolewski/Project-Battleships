@@ -201,33 +201,113 @@ class BotPlayer(Player):
         board_width=constants.BOARD_CELL_SIZE,
     ):
         super().__init__(board_height=board_height, board_width=board_width)
-        self._previous_attack = (False, None, None)
+        self._first_hit_of_ship_position = None
+        self._next_targets = []
 
     def previous_attack(self):
         return self._previous_attack
 
     def find_new_target(self):
         """returns (y,x) coordinates of next targeted BoardCell"""
-        look_nearby, prevoius_y, previous_x = self.previous_attack()
 
-        if look_nearby:
-            surrounding_potential_targets = []
-            if (prevoius_y, previous_x + 1) in self._potential_targets:
-                surrounding_potential_targets.append((prevoius_y, previous_x + 1))
-            if (prevoius_y, previous_x - 1) in self._potential_targets:
-                surrounding_potential_targets.append((prevoius_y, previous_x - 1))
-            if (prevoius_y - 1, previous_x) in self._potential_targets:
-                surrounding_potential_targets.append((prevoius_y - 1, previous_x))
-            if (prevoius_y + 1, previous_x) in self._potential_targets:
-                surrounding_potential_targets.append((prevoius_y + 1, previous_x))
+        if self._next_targets:
+            return random.choice(self._next_targets)
 
-            # if therea are  surrounding board cells, that have not been shot
-            if surrounding_potential_targets:
-                return random.choice(surrounding_potential_targets)
-
-        # bot picks a random cell on board
         new_target_y, new_target_x = random.choice(self._potential_targets)
         return (new_target_y, new_target_x)
+
+    def look_for_target_above(self, target_y, target_x, opponents_board):
+        # from target_y-1  to 0 inclusive
+        for new_target_y in range(target_y - 1, -1, -1):
+            if (new_target_y, target_x) in self._potential_targets:
+                self._next_targets.append((new_target_y, target_x))
+                return
+            elif opponents_board[new_target_y, target_x].is_free:
+                # we shot here and it is see
+                return
+
+    def look_for_target_below(self, target_y, target_x, opponents_board):
+        # from target_y + 1 to the board_height-1 inclusive
+        for new_target_y in range(target_y + 1, self._board_height):
+            if (new_target_y, target_x) in self._potential_targets:
+                self._next_targets.append((new_target_y, target_x))
+                return
+            elif opponents_board[new_target_y, target_x].is_free:
+                # we shot here and it is see
+                return
+
+    def look_for_target_to_the_left(self, target_y, target_x, opponents_board):
+        # from target_x-1  to 0 inclusive
+        for new_target_x in range(target_x - 1, -1, -1):
+            if (target_y, new_target_x) in self._potential_targets:
+                self._next_targets.append((target_y, new_target_x))
+                return
+            elif opponents_board[target_y, new_target_x].is_free:
+                # we shot here and it is see
+                return
+
+    def look_for_target_to_the_right(self, target_y, target_x, opponents_board):
+        # from target_y-1  to 0 inclusive
+        for new_target_x in range(target_x + 1, self._board_width):
+            if (target_y, new_target_x) in self._potential_targets:
+                self._next_targets.append((target_y, new_target_x))
+                return
+            elif opponents_board[target_y, new_target_x].is_free:
+                # we shot here and it is see
+                return
+
+    def look_for_targets_in_line(self, target_y, target_x, line_vertical, opponent):
+        self._next_targets = []
+        opponents_board = opponent.board
+        if line_vertical:  # two ship segments have been shot in vertical line
+            self.look_for_target_above(target_y, target_x, opponents_board)
+            self.look_for_target_below(target_y, target_x, opponents_board)
+        else:  # line horizontal
+            self.look_for_target_to_the_right(target_y, target_x, opponents_board)
+            self.look_for_target_to_the_left(target_y, target_x, opponents_board)
+
+    def handle_next_targets(self, attack_status, target_y, target_x, opponent):
+        pass
+        if attack_status == constants.SHIP_SUNK:
+            self._next_targets = []
+        elif attack_status == constants.SHIP_HIT:
+            if not self._next_targets:
+                # first shot of ship - bot will try shooting around until hits
+
+                # adding next targets
+                if (target_y + 1, target_x) in self._potential_targets:
+                    self._next_targets.append((target_y + 1, target_x))
+                if (target_y, target_x + 1) in self._potential_targets:
+                    self._next_targets.append((target_y, target_x + 1))
+                if (target_y - 1, target_x) in self._potential_targets:
+                    self._next_targets.append((target_y - 1, target_x))
+                if (target_y, target_x - 1) in self._potential_targets:
+                    self._next_targets.append((target_y, target_x - 1))
+
+                self._first_hit_of_ship_position = (target_y, target_x)
+            else:
+                # second hit of ship next targets should be performed in line
+                first_hit_y, first_hit_x = self._first_hit_of_ship_position
+                if first_hit_y == target_y:
+                    # ship is horizontal - updating next targets
+                    self.look_for_targets_in_line(
+                        target_y=target_y,
+                        target_x=target_x,
+                        line_vertical=False,
+                        opponent=opponent,
+                    )
+                else:
+                    # ship is vertical - updating next targets
+                    self.look_for_targets_in_line(
+                        target_y=target_y,
+                        target_x=target_x,
+                        line_vertical=True,
+                        opponent=opponent,
+                    )
+
+        if (target_y, target_x) in self._next_targets:
+            self._next_targets.remove((target_y, target_x))
+        self._potential_targets.remove((target_y, target_x))
 
     def perform_attack(self, opponent):
         """
@@ -235,21 +315,22 @@ class BotPlayer(Player):
         at surrounding cells
         """
 
+        # bot has no potential targes, so it cannot perform
         if not self._potential_targets:
-            # bot has no potential targes, so it cannot perform
             return
 
         new_target_y, new_target_x = self.find_new_target()
 
+        # performing an attack
         attack_status = opponent.take_attack(
             coordinate_x=new_target_x, coordinate_y=new_target_y
         )
-        self._previous_attack = (
-            True if attack_status == constants.SHIP_HIT else False,
-            new_target_y,
-            new_target_x,
-        )
-        self._potential_targets.remove((new_target_y, new_target_x))
+
+        self.handle_next_targets(attack_status, new_target_y, new_target_x, opponent)
+
+        print("next targets: " + str(self._next_targets))
+        print("current hit" + str((new_target_y, new_target_x)))
+        print("________")
 
     def position_ships(self):
         while self._ships_to_place:
