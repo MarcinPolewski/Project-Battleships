@@ -174,6 +174,13 @@ class GameLogicController:
             self._prompts.append("Already shot here, try elsewhere")
             return
 
+        # check if current player has won
+        if self._player_attacked.is_defeated:
+            # current player has won
+            self._winner = self._current_player
+            self._phase = constants.GAME_RESULT_PHASE
+            return
+
         # prompting user attack status
         if attack_status == constants.SHIP_HIT:
             self._prompts.append("You hit!")
@@ -182,24 +189,17 @@ class GameLogicController:
         elif attack_status == constants.SHIP_SUNK:
             self._prompts.append("You have shot down ship!")
 
-        # check if game is won
-        if self._player1.is_defeated:
-            # player 2 has won
-            self._winner = self._player2
-            self._phase = constants.GAME_RESULT_PHASE
-            return
-        elif self._player2.is_defeated:
-            # player1 has won
-            self._winner = self._player1
-            self._phase = constants.GAME_RESULT_PHASE
-            return
-
         # swithcing current player or computer attacks
         if self._gamemode == constants.PVP:
             self._phase = constants.READY_TO_SWITCH_PHASE
         else:
             # computer performs attack
             self._player2.perform_attack(self._player1)
+            # check if bot has won
+            if self._current_player.is_defeated:
+                self._winner = self._player2
+                self._phase = constants.GAME_RESULT_PHASE
+                return
 
     def exit_black_screen_phase(self):
         """method trigged when user have switch in real world
