@@ -95,6 +95,7 @@ class ScreenHandler:
         self._screen.blit(self._current_background, (0, 0))
 
     def draw_logo(self):
+        """draw logo"""
         self._screen.blit(self._logo, constants.LOGO_POSITION)
 
     def draw_tables(self):
@@ -116,6 +117,7 @@ class ScreenHandler:
         )
 
     def draw_message_to_switch(self):
+        """draws message to switch users at computer"""
         image_width = self._blackscreen_prompt.get_width()
         image_height = self._blackscreen_prompt.get_height()
 
@@ -166,12 +168,15 @@ class StatusBarHandler:
         pass
 
     def draw_background(self):
+        """draws backround of status bar"""
         self._screen.blit(self._background, (0, 0))
 
     def draw_fleet_of_player(self, player, on_the_left):
+        """draws fleet of one player"""
+
         # start drawing over corresponding table and end 600 px
         x = constants.TABLE_HORIZONTAL_OFFSET
-        y = constants.FLEET_STATUS_OFFSET
+        y = constants.FLEET_STATUS_VERTICAL_OFFSET
         if not on_the_left:
             x = (
                 constants.SCREEN_WIDTH
@@ -210,6 +215,7 @@ class StatusBarHandler:
             x += constants.SMALL_SHIP_ICON_SIZE * 2
 
     def draw_fleet_status(self):
+        """hadnles drawing fleet status on status bar"""
         self.draw_fleet_of_player(
             player=self._game_controller.current_player, on_the_left=True
         )
@@ -217,7 +223,44 @@ class StatusBarHandler:
             player=self._game_controller.player_attacked, on_the_left=False
         )
 
+    def calculate_x_position_of_name(self, image, for_left_table):
+        """returns x position of text image so it is in the middle of table
+        if for_left_table is True is's above left table
+        """
+        image_width = image.get_width()
+        board_width = constants.TABLE_SIZE
+        x = (board_width - image_width) // 2
+        if for_left_table:
+            x += constants.TABLE_HORIZONTAL_OFFSET
+        else:
+            x += (
+                constants.SCREEN_WIDTH
+                - constants.TABLE_HORIZONTAL_OFFSET
+                - constants.TABLE_SIZE
+            )
+
+        return x
+
+    def draw_name_above_table(self, name, above_left_table):
+        """draws players name above corresponing table"""
+        image = get_text_image(
+            text=name,
+            text_size=constants.STATUS_BAR_FONT_SIZE,
+            text_color=constants.STATUS_BAR_TEXT_COLOR,
+        )
+        x = self.calculate_x_position_of_name(image, above_left_table)
+        y = constants.PLAYER_NAME_VERTICAL_OFFSET
+
+        self._screen.blit(image, (x, y))
+
+    def draw_player_names(self):
+        """handles drawing names of players in the status bar"""
+        players_name, opponents_name = self._game_controller.get_player_names()
+        self.draw_name_above_table(players_name, True)
+        self.draw_name_above_table(opponents_name, False)
+
     def draw(self):
+        """handles drawing screen bar"""
         if self.phase in [
             constants.GAME_PHASE,
             constants.POSITIONING_PHASE,
@@ -226,6 +269,7 @@ class StatusBarHandler:
             self.draw_background()
             self.draw_help_message()
             self.draw_fleet_status()
+            self.draw_player_names()
 
 
 class Prompt(pygame.sprite.Sprite):

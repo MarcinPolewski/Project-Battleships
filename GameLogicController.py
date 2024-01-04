@@ -50,6 +50,17 @@ class GameLogicController:
     def current_player(self):
         return self._current_player
 
+    def get_player_names(self):
+        """returns tuple of (current players name, opponent name)
+        mainly for labeling tables"""
+        if self._gamemode == constants.PVC:
+            return ("Player", "Bot")
+        else:
+            if self._current_player == self._player1:
+                return ("You - Player1", "Opponent - Player2")
+            else:
+                return ("You - Player2", "Opponent - Player1")
+
     @property
     def player_attacked(self):
         return self._player_attacked

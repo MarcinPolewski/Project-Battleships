@@ -435,6 +435,26 @@ def test_play_game_phase_PVC(monkeypatch):
     assert controller.current_player == controller.player1
 
 
+def test_get_players_names(monkeypatch):
+    board_cell_size = 10
+    monkeypatch.setattr("constants.BOARD_CELL_SIZE", board_cell_size)
+
+    standard_ship_quantities = {
+        "Carrier": 1,
+    }
+    monkeypatch.setattr("constants.STANDARD_SHIP_QUANTITIES", standard_ship_quantities)
+
+    game_controller = GameLogicController()
+    game_controller.game_mode_selected(constants.PVC)
+    assert game_controller.get_player_names() == ("Player", "Bot")
+
+    game_controller = GameLogicController()
+    game_controller.game_mode_selected(constants.PVP)
+    assert game_controller.get_player_names() == ("You - Player1", "Opponent - Player2")
+    game_controller.switch_current_player()
+    assert game_controller.get_player_names() == ("You - Player2", "Opponent - Player1")
+
+
 def test_game_result_phase(monkeypatch):
     assert False
 
