@@ -1,6 +1,8 @@
 import constants
 from Player import Player, BotPlayer
 from GameErrors import NotSuchShipToPlaceError, ShipPlacingError, CellAlreadyShotError
+from datetime import timedelta
+import pygame
 
 
 class GameLogicController:
@@ -28,6 +30,10 @@ class GameLogicController:
 
         self._prompts = []
 
+        # variables for statistics
+        self._game_start_time = 0
+        self._game_play_time = timedelta(milliseconds=0)
+        self._rounds_played = 0
         self._winner = None
 
     @property
@@ -49,6 +55,23 @@ class GameLogicController:
     @property
     def current_player(self):
         return self._current_player
+
+    @property
+    def rounds_played(self):
+        return self._rounds_played
+
+    @property
+    def winner(self):
+        return self._winner
+
+    @property
+    def game_play_time(self):
+        """returns timedelta object with time spend on playing game"""
+        if self._phase == constants.GAME_RESULT_PHASE:
+            return timedelta(milliseconds=self._game_play_time)
+
+        time = self._game_start_time - pygame.time.get_ticks()
+        return timedelta(milliseconds=time)
 
     def get_player_names(self):
         """returns tuple of (current players name, opponent name)
@@ -77,6 +100,36 @@ class GameLogicController:
         prompt = self._prompts[0]
         self._prompts.remove(prompt)
         return prompt
+
+    def calculate_players_alive_segments(self, player):
+        """returns how many alive ship segments does player have"""
+        player_alive_segments_counter = 0
+        for ship in player.fleet:
+            player_alive_segments_counter += ship.length - ship.hit_counter
+
+        return player_alive_segments_counter
+
+    def calculate_total_ship_segments(self):
+        """returns how many ship segments are in total"""
+        total_segment_counter = 0
+        for ship_name in constants.STANDARD_SHIP_QUANTITIES:
+            quantity = constants.STANDARD_SHIP_QUANTITIES[ship_name]
+            length = constants.SHIP_LENGTHS[ship_name]
+            total_segment_counter += quantity * length
+
+        return total_segment_counter
+
+    def calculate_percentage_state_of_players_fleet(self, player):
+        """returns percentage equal to total not shot ship segments
+        divided by total amount of segments"""
+
+        player_alive_segments_counter = self.calculate_players_alive_segments(player)
+        total_segment_counter = self.calculate_total_ship_segments()
+
+        try:
+            return (player_alive_segments_counter * 100) // total_segment_counter
+        except ZeroDivisionError:
+            return 0
 
     def switch_current_player(self):
         """handles switching users in PVP"""
@@ -111,8 +164,11 @@ class GameLogicController:
         self._current_player = self._player1
         self._player_attacked = self._player2
 
+        # setting phase and gamemode
         self._gamemode = gamemode
         self._phase = constants.POSITIONING_PHASE
+
+        self._game_start_time = pygame.time.get_ticks()
 
     def player_positions_ships(
         self, player, start_row, start_column, end_row, end_column
@@ -174,9 +230,12 @@ class GameLogicController:
             self._prompts.append("Already shot here, try elsewhere")
             return
 
+        self._rounds_played += 1
+
         # check if current player has won
         if self._player_attacked.is_defeated:
             # current player has won
+            self._game_play_time = self._game_start_time - pygame.time.get_ticks()
             self._winner = self._current_player
             self._phase = constants.GAME_RESULT_PHASE
             return
@@ -195,21 +254,19 @@ class GameLogicController:
         else:
             # computer performs attack
             self._player2.perform_attack(self._player1)
+            # increment round counter
+            self._rounds_played += 1
             # check if bot has won
             if self._current_player.is_defeated:
                 self._winner = self._player2
                 self._phase = constants.GAME_RESULT_PHASE
+                self._game_play_time = self._game_start_time - pygame.time.get_ticks()
                 return
 
     def exit_black_screen_phase(self):
         """method trigged when user have switch in real world
         and current user is ready to proceed"""
         self._phase = self._phase_to_return
-
-    def game_result_phase(self, mouse_was_pressed, mouse_was_released, mouse_position):
-        """method handles end of the game phase"""
-        pass
-        # @TODO
 
     def players_cells_selected(self, start_row, start_column, end_row, end_column):
         """method trigger when user has selected cells on his own(left) board"""

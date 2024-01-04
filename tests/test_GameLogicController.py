@@ -455,8 +455,87 @@ def test_get_players_names(monkeypatch):
     assert game_controller.get_player_names() == ("You - Player2", "Opponent - Player1")
 
 
-def test_game_result_phase(monkeypatch):
-    assert False
+def test_round_counter_PVC(monkeypatch):
+    board_cell_size = 10
+    monkeypatch.setattr("constants.BOARD_CELL_SIZE", board_cell_size)
+
+    standard_ship_quantities = {
+        "Carrier": 1,
+    }
+    monkeypatch.setattr("constants.STANDARD_SHIP_QUANTITIES", standard_ship_quantities)
+
+    game_controller = GameLogicController()
+    game_controller.game_mode_selected(constants.PVC)
+
+    assert game_controller.rounds_played == 0
+    game_controller.players_cells_selected(
+        start_column=0, start_row=0, end_row=4, end_column=0
+    )
+    assert game_controller.rounds_played == 0
+
+    game_controller.enemys_board_mouse_pressed(1, 1)
+    assert game_controller.rounds_played == 2
+
+
+def test_round_counter_PVP(monkeypatch):
+    board_cell_size = 10
+    monkeypatch.setattr("constants.BOARD_CELL_SIZE", board_cell_size)
+
+    standard_ship_quantities = {
+        "Carrier": 1,
+    }
+    monkeypatch.setattr("constants.STANDARD_SHIP_QUANTITIES", standard_ship_quantities)
+
+    game_controller = GameLogicController()
+    game_controller.game_mode_selected(constants.PVP)
+
+    assert game_controller.rounds_played == 0
+    game_controller.players_cells_selected(
+        start_column=0, start_row=0, end_row=4, end_column=0
+    )
+    game_controller.exit_black_screen_phase()
+    assert game_controller.phase == constants.POSITIONING_PHASE
+
+    game_controller.players_cells_selected(
+        start_column=0, start_row=0, end_row=4, end_column=0
+    )
+    assert game_controller.phase == constants.GAME_PHASE
+
+    game_controller.rounds_played == 0
+    game_controller.enemys_board_mouse_pressed(1, 1)
+    assert game_controller.rounds_played == 1
+    game_controller.switch_current_player()
+    game_controller.exit_black_screen_phase()
+    game_controller.enemys_board_mouse_pressed(1, 1)
+    assert game_controller.rounds_played == 2
+
+
+def test_calculate_players_alive_segments(monkeypatch):
+    board_cell_size = 10
+    monkeypatch.setattr("constants.BOARD_CELL_SIZE", board_cell_size)
+
+    standard_ship_quantities = {
+        "Carrier": 1,
+    }
+    monkeypatch.setattr("constants.STANDARD_SHIP_QUANTITIES", standard_ship_quantities)
+
+    game_controller = GameLogicController(board_height=5, board_width=1)
+    game_controller.game_mode_selected(constants.PVC)
+
+    game_controller.players_cells_selected(
+        start_column=0, start_row=0, end_row=4, end_column=0
+    )
+
+    player1 = game_controller.player1
+    player2 = game_controller.player2
+
+    assert game_controller.calculate_players_alive_segments(player1) == 5
+    assert game_controller.calculate_players_alive_segments(player2) == 5
+
+    game_controller.enemys_board_mouse_pressed(0, 0)
+
+    assert game_controller.calculate_players_alive_segments(player1) == 4
+    assert game_controller.calculate_players_alive_segments(player2) == 4
 
 
 def test_players_cells_selected(monkeypatch):

@@ -26,7 +26,8 @@ from TextImageGenerator import (
 
 
 class ScreenHandler:
-    """handles background, tables and logo"""
+    """handles static elements - background, logo, prompt in blackscreen phase
+    and statistics on the end of game screen"""
 
     def __init__(self, screen, game_controller):
         # loading background images
@@ -127,6 +128,13 @@ class ScreenHandler:
 
         self._screen.blit(self._blackscreen_prompt, (x, y))
 
+    def draw_statistics(self):
+        """method draws statistics in the middle of screen"""
+        time_played = self._game_controller.game_play_time
+        rounds_played = self._game_controller.rounds_played
+        winners_fleet_percentage = self._game_controller.winner
+        winner = self._game_controller.winner
+
     def draw(self):
         """method draws backround and tables"""
         self.draw_backroung()
@@ -142,10 +150,12 @@ class ScreenHandler:
         elif self.phase == constants.BLACKSCREEN_PHASE:
             self.draw_message_to_switch()
 
+        elif self.phase == constants.GAME_RESULT_PHASE:
+            self.draw_statistics()
+
 
 class StatusBarHandler:
-    """class handles displaying information of status bar
-    during poitioning it's which ships to posiion"""
+    """class handles displaying status bar with informations"""
 
     def __init__(self, screen, game_controller):
         self._screen = screen
@@ -273,6 +283,8 @@ class StatusBarHandler:
 
 
 class Prompt(pygame.sprite.Sprite):
+    """class handles dispalying single message to user"""
+
     def __init__(self, screen, prompt_text):
         pygame.sprite.Sprite.__init__(self)
         self._prompt_text = prompt_text
@@ -317,8 +329,6 @@ class Prompt(pygame.sprite.Sprite):
 class PromptHandler:
     """reads fetches propts from game controller,
     creates instance of Prompt and updates all currently visible prompts
-
-    prompts user at the beginning of phase on what to do
     """
 
     def __init__(self, screen, game_controller):
