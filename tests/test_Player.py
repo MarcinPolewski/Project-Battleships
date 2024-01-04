@@ -367,44 +367,99 @@ def test_Player_perform_attack(monkeypatch):
 
 def test_BotPlayer_init():
     bot = BotPlayer(board_height=10, board_width=15)
-    assert bot.previous_attack() == (False, None, None)
+    assert bot._next_targets == []
+
+
+def test_BotPlayer_find_new_target_random(monkeypatch):
+    bot = BotPlayer(board_height=10, board_width=15)
+    assert bot.find_new_target() in bot.potential_targets
+
+
+def test_BotPlayer_add_next_target():
+    bot = BotPlayer(board_height=10, board_width=15)
+    assert bot.next_targets == []
+
+    bot.add_next_target((5, 5))
+    assert [((5, 5))] == bot.next_targets
+
+    bot.add_next_target((6, 6))
+    assert (5, 5) in bot.next_targets
+    assert (6, 6) in bot.next_targets
+    assert len(bot.next_targets) == 2
 
 
 def test_BotPlayer_find_new_target(monkeypatch):
     bot = BotPlayer(board_height=10, board_width=15)
 
-    def return_previous(_):
-        return (True, 1, 1)
+    bot.add_next_target((5, 5))
 
-    monkeypatch.setattr("Player.BotPlayer.previous_attack", return_previous)
-    bot._previous_attack = (True, 1, 1)
-    new_target = bot.find_new_target()
+    assert bot.find_new_target() == (5, 5)
 
-    assert (
-        new_target == (0, 1)
-        or new_target == (1, 0)
-        or new_target == (1, 2)
-        or new_target == (2, 1)
+
+def test_handle_next_target(monkeypatch):
+    standard_ship_quantities = {"Cruiser": 1}
+    monkeypatch.setattr("constants.STANDARD_SHIP_QUANTITIES", standard_ship_quantities)
+    bot = BotPlayer(board_height=10, board_width=10)
+    player = Player(board_height=10, board_width=10)
+    player.add_ship(
+        length=3, orientation=constants.SHIP_VERTICAL, coordinate_x=0, coordinate_y=0
     )
 
+    # first attack - missed
+    bot.handle_next_targets(
+        attack_status=constants.ATTACK_UNSUCCESSFUL,
+        target_x=5,
+        target_y=5,
+        opponent=player,
+    )
+    assert bot.next_targets == []
 
-def test_BotPlayer_find_new_target_corner(monkeypatch):
-    bot = BotPlayer(board_height=5, board_width=5)
+    # second attack - look for targets around
+    bot.handle_next_targets(
+        attack_status=constants.SHIP_HIT, target_x=0, target_y=0, opponent=player
+    )
+    assert (0, 1) in bot.next_targets
+    assert (1, 0) in bot.next_targets
+    assert len(bot.next_targets) == 2
 
-    def return_previous(_):
-        return (True, 4, 4)
+    # third attack - look for targets in line (only one)
+    bot.handle_next_targets(
+        attack_status=constants.SHIP_HIT, target_x=0, target_y=1, opponent=player
+    )
+    assert (2, 0) in bot.next_targets
+    assert len(bot.next_targets) == 1
 
-    monkeypatch.setattr("Player.BotPlayer.previous_attack", return_previous)
-    bot._previous_attack = (True, 1, 1)
-    new_target = bot.find_new_target()
+    # forth attack - bot has sunk ship
+    bot.handle_next_targets(
+        attack_status=constants.SHIP_SUNK, target_x=0, target_y=2, opponent=player
+    )
+    assert not bot.next_targets
 
-    assert new_target == (4, 3) or new_target == (3, 4)
 
+def test_perform_attack(monkeypatch):
+    standard_ship_quantities = {"PatrolShip": 1}
+    monkeypatch.setattr("constants.STANDARD_SHIP_QUANTITIES", standard_ship_quantities)
+    bot = BotPlayer(board_height=2, board_width=1)
+    player = Player(board_height=2, board_width=1)
+    player.add_ship(
+        length=2, orientation=constants.SHIP_VERTICAL, coordinate_x=0, coordinate_y=0
+    )
 
-def test_BotPlayer_find_new_target_random():
-    bot = BotPlayer(board_height=5, board_width=5)
-    coordinate_y, coordinate_x = bot.find_new_target()
-    assert (coordinate_y, coordinate_x) in bot.potential_targets
+    assert len(bot.potential_targets) == 2
+    assert bot.next_targets == []
+
+    # checking behaviour internal target variables
+    bot.perform_attack(opponent=player)
+    assert len(bot.potential_targets) == 1
+    assert len(bot.next_targets) == 1
+    # checking if player was hit
+    assert player.board[0, 0].ship_handle.hit_counter == 1
+
+    bot.perform_attack(opponent=player)
+    assert len(bot.potential_targets) == 0
+    assert len(bot.next_targets) == 0
+    # checking if player was hit
+    assert player.board[0, 0].ship_handle.hit_counter == 2
 
 
 def test_BotPlayer_preform_attack(monkeypatch):

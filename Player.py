@@ -204,8 +204,9 @@ class BotPlayer(Player):
         self._first_hit_of_ship_position = None
         self._next_targets = []
 
-    def previous_attack(self):
-        return self._previous_attack
+    @property
+    def next_targets(self):
+        return self._next_targets
 
     def find_new_target(self):
         """returns (y,x) coordinates of next targeted BoardCell"""
@@ -216,7 +217,12 @@ class BotPlayer(Player):
         new_target_y, new_target_x = random.choice(self._potential_targets)
         return (new_target_y, new_target_x)
 
+    def add_next_target(self, next_target):
+        if next_target is not None:
+            self._next_targets.append(next_target)
+
     def look_for_target_above(self, target_y, target_x, opponents_board):
+        """adds to next target"""
         # from target_y-1  to 0 inclusive
         for new_target_y in range(target_y - 1, -1, -1):
             if (new_target_y, target_x) in self._potential_targets:
@@ -267,7 +273,6 @@ class BotPlayer(Player):
             self.look_for_target_to_the_left(target_y, target_x, opponents_board)
 
     def handle_next_targets(self, attack_status, target_y, target_x, opponent):
-        pass
         if attack_status == constants.SHIP_SUNK:
             self._next_targets = []
         elif attack_status == constants.SHIP_HIT:
@@ -327,10 +332,6 @@ class BotPlayer(Player):
         )
 
         self.handle_next_targets(attack_status, new_target_y, new_target_x, opponent)
-
-        print("next targets: " + str(self._next_targets))
-        print("current hit" + str((new_target_y, new_target_x)))
-        print("________")
 
     def position_ships(self):
         while self._ships_to_place:
