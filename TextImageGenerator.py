@@ -3,8 +3,8 @@ import pygame
 
 def get_text_image(text, text_size, text_color):
     """returns image with text provided text"""
-    text_font = pygame.font.SysFont("Arial", text_size)
-
+    # text_font = pygame.font.SysFont("Arial", text_size)
+    text_font = pygame.font.Font("assets/fonts/PixelifySans-Regular.ttf", text_size)
     image = text_font.render(text, True, text_color)
 
     return image
