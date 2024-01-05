@@ -635,7 +635,7 @@ class InputHandler:
         elif isinstance(button, ExitEndScreenButton):
             self._game_controller.exit_game()
         elif isinstance(button, ReplayButton):
-            pass  # @TODO how to restart game??? game_controller.__init__() ???
+            self._game_controller.__init__()
 
         return True
 
