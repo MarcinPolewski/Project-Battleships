@@ -90,6 +90,7 @@ class GameLogicController:
         return timedelta(milliseconds=time)
 
     def get_play_time_as_str(self):
+        """returns time spend playing as a formated str"""
         time_played = int(self.game_play_time.total_seconds())
         minutes, seconds = divmod(time_played, 60)
         hours, minutes = divmod(minutes, 60)
@@ -121,6 +122,17 @@ class GameLogicController:
                 return ("You - Player1", "Opponent - Player2")
             else:
                 return ("You - Player2", "Opponent - Player1")
+
+    def generate_statistics(self):
+        """returns a dictionary of statistics"""
+        statistics = {}
+        statistics["Time of gameplay"] = str(self.get_play_time_as_str())
+        statistics["Rounds played"] = str(self.rounds_played)
+        statistics["Percentage of winners fleet intact"] = str(
+            self.calculate_percentage_state_of_players_fleet(self.winner)
+        )
+
+        return statistics
 
     @property
     def player_attacked(self):

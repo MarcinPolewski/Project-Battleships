@@ -20,8 +20,10 @@ from Buttons import (
 )
 from TextImageGenerator import (
     get_text_image,
-    calculate_text_position_for_logo,
+    calculate_text_position_for_top_half_of_image,
     calculate_positioning_in_the_middle_of_image,
+    calculate_y_in_the_middle_of_image,
+    calculate_x_in_the_middle_of_image,
 )
 
 
@@ -38,6 +40,13 @@ class ScreenHandler:
 
         # loading table image
         self._table_image = pygame.image.load("assets/table/table.png")
+
+        # loading backround for game result
+        self._game_result_backgrounds = pygame.image.load(
+            "assets/Game_result_backround.png"
+        )
+        self._game_result_image = None
+        self._game_result_image_position = None
 
         # loading logo image
         self._logo = pygame.image.load("assets/Logo.png")
@@ -56,7 +65,7 @@ class ScreenHandler:
         )
 
         # calculating position of text on logo
-        logo_text_position = calculate_text_position_for_logo(
+        logo_text_position = calculate_text_position_for_top_half_of_image(
             image_height=self._logo.get_height(),
             image_width=self._logo.get_width(),
             text_height=logo_text_image.get_height(),
@@ -128,12 +137,58 @@ class ScreenHandler:
 
         self._screen.blit(self._blackscreen_prompt, (x, y))
 
-    def draw_statistics(self):
+    def calculate_game_result_image_position(self, image_to_position):
+        position = calculate_positioning_in_the_middle_of_image(
+            image_height=constants.SCREEN_HEIGHT,
+            image_width=constants.SCREEN_WIDTH,
+            text_height=image_to_position.get_height(),
+            text_width=image_to_position.get_width(),
+        )
+        return position
+
+    def generate_game_result_image(self):
+        game_result = self._game_result_backgrounds
+
+        winner = self._game_controller.winner_name + " has won!!!"
+        winner_image = get_text_image(
+            text=winner,
+            text_color=constants.WINNER_TEXT_COLOR,
+            text_size=constants.WINNER_TEXT_SIZE,
+        )
+        winner_y = constants.WINNER_VERTICAL_OFFSET
+        winner_x = calculate_x_in_the_middle_of_image(
+            image_width=game_result.get_width(), text_width=winner_image.get_width()
+        )
+
+        game_result.blit(winner_image, (winner_x, winner_y))
+
+        y = winner_image.get_height() + constants.STATISTICS_VERTICAL_OFFSET
+        x = constants.STATISTICS_HORIZONTAL_OFFSET
+
+        statistics = self._game_controller.generate_statistics()
+        for statistic_key in statistics:
+            statistic_value = statistics[statistic_key]
+            statistic_text = statistic_key + ": " + statistic_value
+
+            statistic_image = get_text_image(
+                text=statistic_text,
+                text_size=constants.STATISTICS_TEXT_SIZE,
+                text_color=constants.STATISTICS_TEXT_COLOR,
+            )
+            y += statistic_image.get_height() + constants.STATISTIC_SPACING
+            game_result.blit(statistic_image, (x, y))
+
+        return game_result
+
+    def draw_game_result(self):
         """method draws statistics in the middle of screen"""
-        time_played = self._game_controller.game_play_time
-        rounds_played = self._game_controller.rounds_played
-        winners_fleet_percentage = self._game_controller.winner
-        winner = self._game_controller.winner
+
+        if self._game_result_image is None:
+            self._game_result_image = self.generate_game_result_image()
+            self._game_result_image_position = (
+                self.calculate_game_result_image_position(self._game_result_image)
+            )
+        self._screen.blit(self._game_result_image, self._game_result_image_position)
 
     def draw(self):
         """method draws backround and tables"""
@@ -151,7 +206,7 @@ class ScreenHandler:
             self.draw_message_to_switch()
 
         elif self.phase == constants.GAME_RESULT_PHASE:
-            self.draw_statistics()
+            self.draw_game_result()
 
 
 class StatusBarHandler:
@@ -371,18 +426,6 @@ class Visualizer:
         for i in range(1, 6):
             temp = pygame.image.load(f"assets/ships/Ship{i}.png")
             self._ship_images.append(temp)
-
-        # initialize cloud animation dict
-        self._cloud_animation_status = dict()
-        for row in range(constants.BOARD_CELL_SIZE):
-            for column in range(constants.BOARD_CELL_SIZE):
-                self._cloud_animation_status[(row, column)] = 1
-
-        # initialize ship animation dict
-        self._ship_animation_status = dict()
-        for row in range(constants.BOARD_CELL_SIZE):
-            for column in range(constants.BOARD_CELL_SIZE):
-                self._ship_animation_status[(row, column)] = 1
 
     @property
     def player1(self):
