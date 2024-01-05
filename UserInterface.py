@@ -1,6 +1,9 @@
 """ this file handles interaction with user"""
 
 from GameErrors import OutOfTableError
+from Images import ImageHandler
+from MemoryAccess import AssetLoader
+
 import constants
 import pygame
 from GameLogicController import GameLogicController
@@ -31,54 +34,28 @@ class ScreenHandler:
     """handles static elements - background, logo, prompt in blackscreen phase
     and statistics on the end of game screen"""
 
-    def __init__(self, screen, game_controller):
-        # loading background images
-        self._background_images = []
-        for i in range(1, 6):
-            temp = pygame.image.load(f"assets/see/background{i}.png")
-            self._background_images.append(temp)
+    def __init__(self, screen, game_controller, image_handler):
+        self._image_handler = image_handler
 
-        # loading table image
-        self._table_image = pygame.image.load("assets/table/table.png")
+        # loading right images
+        self._see_images = image_handler.see_images
+        self._logo = image_handler.logo_image
+        self._blackscreen_prompt = image_handler.blackscreen_prompt
+        self._table_image = image_handler.table_image
 
-        # loading backround for game result
-        self._game_result_backgrounds = pygame.image.load(
-            "assets/Game_result_backround.png"
+        # loading positions
+        self._blackscreen_prompt_position = (
+            image_handler.calculate_x_and_y_to_centre_on_screen(
+                self._blackscreen_prompt
+            )
         )
+        self._game_result_background = image_handler.game_result_backround
         self._game_result_image = None
-        self._game_result_image_position = None
-
-        # loading logo image
-        self._logo = pygame.image.load("assets/Logo.png")
-        # generating text image for logo
-        logo_text_image = get_text_image(
-            text="Battleship",
-            text_size=constants.LOGO_TEXT_SIZE,
-            text_color=(255, 0, 0),
-        )
-
-        # generate message for black screen
-        self._blackscreen_prompt = get_text_image(
-            text="Switch user at the computer, press mouse button to continue...",
-            text_size=constants.MESSAGE_TO_SWITCH_FONT_SIZE,
-            text_color=(255, 255, 255),
-        )
-
-        # calculating position of text on logo
-        logo_text_position = calculate_text_position_for_top_half_of_image(
-            image_height=self._logo.get_height(),
-            image_width=self._logo.get_width(),
-            text_height=logo_text_image.get_height(),
-            text_width=logo_text_image.get_width(),
-        )
-
-        # mergin logo and logo_text
-        self._logo.blit(logo_text_image, logo_text_position)
 
         self._screen = screen
         self._game_controller = game_controller
         self._background_idx = 0
-        self._current_background = self._background_images[0]
+        self._current_background = self._image_handler.see_images[0]
         self._last_background_change = pygame.time.get_ticks()
 
     @property
@@ -94,10 +71,8 @@ class ScreenHandler:
             >= constants.BACKGROUND_COOLDOWN
         ):
             # incrementing idx, after exceeding array's length, going back to 0
-            self._background_idx = (self._background_idx + 1) % len(
-                self._background_images
-            )
-            self._current_background = self._background_images[self._background_idx]
+            self._background_idx = (self._background_idx + 1) % len(self._see_images)
+            self._current_background = self._see_images[self._background_idx]
             self._last_background_change = pygame.time.get_ticks()
 
     def draw_backroung(self):
@@ -128,14 +103,7 @@ class ScreenHandler:
 
     def draw_message_to_switch(self):
         """draws message to switch users at computer"""
-        image_width = self._blackscreen_prompt.get_width()
-        image_height = self._blackscreen_prompt.get_height()
-
-        # @TODO use function from TextImageGenerator
-        x = (constants.SCREEN_WIDTH - image_width) // 2
-        y = (constants.SCREEN_HEIGHT - image_height) // 2
-
-        self._screen.blit(self._blackscreen_prompt, (x, y))
+        self._screen.blit(self._blackscreen_prompt, self._blackscreen_prompt_position)
 
     def calculate_game_result_image_position(self, image_to_position):
         position = calculate_positioning_in_the_middle_of_image(
@@ -147,7 +115,7 @@ class ScreenHandler:
         return position
 
     def generate_game_result_image(self):
-        game_result = self._game_result_backgrounds
+        game_result = self._game_result_background
 
         winner = self._game_controller.winner_name + " has won!!!"
         winner_image = get_text_image(
@@ -212,24 +180,22 @@ class ScreenHandler:
 class StatusBarHandler:
     """class handles displaying status bar with informations"""
 
-    def __init__(self, screen, game_controller):
+    def __init__(self, screen, game_controller, image_handler):
         self._screen = screen
         self._game_controller = game_controller
+        self._image_handler = image_handler
 
         # load background
-        self._background = pygame.image.load("assets/StatusBar.png")
+        self._background = image_handler.status_bar_background
 
         # load small ship icon
-        self._small_ship_icon = pygame.image.load("assets/ships/SmallShipIcon.png")
+        self._small_ship_icon = image_handler.small_ship_icon
 
     @property
     def phase(self):
         return self._game_controller.phase
 
     def update(self):
-        pass
-
-    def draw_help_message(self):
         pass
 
     def draw_background(self):
@@ -332,7 +298,6 @@ class StatusBarHandler:
             constants.READY_TO_SWITCH_PHASE,
         ]:
             self.draw_background()
-            self.draw_help_message()
             self.draw_fleet_status()
             self.draw_player_names()
 
@@ -340,7 +305,7 @@ class StatusBarHandler:
 class Prompt(pygame.sprite.Sprite):
     """class handles dispalying single message to user"""
 
-    def __init__(self, screen, prompt_text):
+    def __init__(self, screen, prompt_text, image_handler):
         pygame.sprite.Sprite.__init__(self)
         self._prompt_text = prompt_text
         self._screen = screen
@@ -350,18 +315,11 @@ class Prompt(pygame.sprite.Sprite):
         # @TODO? make dependent on length of prompts
         self._cooldown = constants.PROMPT_COOLDOWN
 
-        # create prompt image
-        self._image = get_text_image(
-            text=prompt_text,
-            text_size=constants.PROMPT_TEXT_SIZE,
-            text_color=constants.PROMPT_COLOR,
-        )
-        # calculate prompt position in the middle of screen
-        self._position = calculate_positioning_in_the_middle_of_image(
-            image_height=constants.SCREEN_HEIGHT,
-            image_width=constants.SCREEN_WIDTH,
-            text_height=self._image.get_height(),
-            text_width=self._image.get_width(),
+        # load image
+        self._image = image_handler.get_prompt_image(prompt_text)
+        # calculate position
+        self._position = image_handler.calculate_x_and_y_to_centre_on_screen(
+            self._image
         )
 
     def update(self):
@@ -386,9 +344,10 @@ class PromptHandler:
     creates instance of Prompt and updates all currently visible prompts
     """
 
-    def __init__(self, screen, game_controller):
+    def __init__(self, screen, game_controller, image_handler):
         self._game_controller = game_controller
         self._screen = screen
+        self._image_handler = image_handler
         self._active_prompts = pygame.sprite.Group()
 
     def update(self):
@@ -396,7 +355,11 @@ class PromptHandler:
         fetched_prompt = self._game_controller.fetch_prompt()
         if fetched_prompt is not None:
             # create instance of Prompt class and add to list
-            prompt = Prompt(screen=self._screen, prompt_text=fetched_prompt)
+            prompt = Prompt(
+                screen=self._screen,
+                prompt_text=fetched_prompt,
+                image_handler=self._image_handler,
+            )
             self._active_prompts.add([prompt])
         # udpate existing prompts
         for prompt in self._active_prompts:
@@ -411,21 +374,12 @@ class PromptHandler:
 class Visualizer:
     """handles visualising game situation on boards/tables"""
 
-    def __init__(self, screen, game_controller):
+    def __init__(self, screen, game_controller, image_handler):
         self._screen = screen
         self._game_controller = game_controller
 
-        # loading cloud images
-        self._cloud_images = []
-        for i in range(1, 6):
-            temp = pygame.image.load(f"assets/clouds/Cloud{i}.png")
-            self._cloud_images.append(temp)
-
-        # loading ship images
-        self._ship_images = []
-        for i in range(1, 6):
-            temp = pygame.image.load(f"assets/ships/Ship{i}.png")
-            self._ship_images.append(temp)
+        self._cloud_images = image_handler.cloud_images
+        self._ship_images = image_handler.ship_images
 
     @property
     def player1(self):
@@ -670,12 +624,24 @@ def main():
 
     # initializing controllers
     game_controller = GameLogicController()
-    visualizer = Visualizer(screen=game_screen, game_controller=game_controller)
-    screen_handler = ScreenHandler(screen=game_screen, game_controller=game_controller)
-    button_handler = ButtonHandler(screen=game_screen, game_controller=game_controller)
-    prompt_handler = PromptHandler(screen=game_screen, game_controller=game_controller)
+    asset_loader = AssetLoader()
+    image_handler = ImageHandler(
+        asset_loader=asset_loader, game_controller=game_controller
+    )
+    visualizer = Visualizer(
+        screen=game_screen, game_controller=game_controller, image_handler=image_handler
+    )
+    screen_handler = ScreenHandler(
+        screen=game_screen, game_controller=game_controller, image_handler=image_handler
+    )
+    button_handler = ButtonHandler(
+        screen=game_screen, game_controller=game_controller, image_handler=image_handler
+    )
+    prompt_handler = PromptHandler(
+        screen=game_screen, game_controller=game_controller, image_handler=image_handler
+    )
     status_bar_hanlder = StatusBarHandler(
-        screen=game_screen, game_controller=game_controller
+        screen=game_screen, game_controller=game_controller, image_handler=image_handler
     )
     input_handler = InputHandler(
         game_controller=game_controller, button_handler=button_handler
