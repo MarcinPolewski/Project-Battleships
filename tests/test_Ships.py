@@ -9,7 +9,7 @@ def test_Ship_init():
 
 def test_is_down():
     lajba = Ship(5)
-    assert lajba.is_down() == False
+    assert not lajba.is_down()
 
 
 def test_position_ship():

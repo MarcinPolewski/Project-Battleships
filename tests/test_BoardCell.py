@@ -8,25 +8,25 @@ from GameErrors import OcupiedCellError
 
 def test_BoardCell_init():
     a = BoardCell()
-    assert a.is_free == True
-    assert a.ship_handle == None
-    assert a.was_shot == False
+    assert a.is_free
+    assert a.ship_handle is None
+    assert not a.was_shot
 
 
 def test_BoardCell_position_ship_and_remove_ship():
     a = BoardCell()
     s = Ship(5)
 
-    assert a.is_free == True
-    assert a.ship_handle == None
+    assert a.is_free
+    assert a.ship_handle is None
 
     a.position_ship(s)
-    assert a.is_free == False
+    assert not a.is_free
     assert a.ship_handle == s
 
     a.remove_ship()
-    assert a.is_free == True
-    assert a.ship_handle == None
+    assert a.is_free
+    assert a.ship_handle is None
 
 
 def test_BoardCell_position_ship_ocupied_cell():

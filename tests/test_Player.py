@@ -25,8 +25,8 @@ def test_Player_init(monkeypatch):
     # czy elementy nie wskazują na ten sam obiekt
     s = Ship(5)
     player1.board[0, 0].position_ship(s)
-    assert player1.board[0, 0].is_free == False
-    assert player1.board[1, 0].is_free == True
+    assert not player1.board[0, 0].is_free
+    assert player1.board[1, 0].is_free
 
 
 def test_Player_init_ships_to_position(monkeypatch):
@@ -104,13 +104,13 @@ def test_Player_is_defeated(monkeypatch):
     player1 = Player(board_height=5, board_width=10)
 
     player1.add_ship(3, constants.SHIP_VERTICAL, 0, 0)
-    assert player1.is_defeated == False
+    assert not player1.is_defeated
     player1.take_attack(0, 0)
-    assert player1.is_defeated == False
+    assert not player1.is_defeated
     player1.take_attack(0, 1)
-    assert player1.is_defeated == False
+    assert not player1.is_defeated
     player1.take_attack(0, 2)
-    assert player1.is_defeated == True
+    assert player1.is_defeated
 
 
 def test_Player_potential_targets():
@@ -181,13 +181,13 @@ def test_Player_add_ship_Vertical(monkeypatch):
                 and row_index <= constants.CARRIER_LENGTH
             ):
                 # there should be carrier
-                assert player1.board[row_index, column_index].is_free == False
+                assert not player1.board[row_index, column_index].is_free
                 assert isinstance(
                     player1.board[row_index, column_index].ship_handle, Carrier
                 )
             else:
-                assert player1.board[row_index, column_index].is_free == True
-                assert player1.board[row_index, column_index].ship_handle == None
+                assert player1.board[row_index, column_index].is_free
+                assert player1.board[row_index, column_index].ship_handle is None
 
 
 def test_Player_add_ship_Horizontal(monkeypatch):
@@ -212,13 +212,13 @@ def test_Player_add_ship_Horizontal(monkeypatch):
         for column_index in range(15):
             if row_index == 1 and column_index >= 1 and column_index <= 5:
                 # there should be carrier
-                assert player1.board[row_index, column_index].is_free == False
+                assert not player1.board[row_index, column_index].is_free
                 assert isinstance(
                     player1.board[row_index, column_index].ship_handle, Carrier
                 )
             else:
-                assert player1.board[row_index, column_index].is_free == True
-                assert player1.board[row_index, column_index].ship_handle == None
+                assert player1.board[row_index, column_index].is_free
+                assert player1.board[row_index, column_index].ship_handle is None
 
 
 def test_Player_add_ship_out_of_board(monkeypatch):
@@ -307,7 +307,7 @@ def test_Player_take_attack(monkeypatch):
     player1.add_ship(ps1, constants.SHIP_VERTICAL, 0, 0)
     player1.add_ship(ps2, constants.SHIP_VERTICAL, 1, 0)
 
-    assert player1.board[0, 0].ship_handle.is_down() == False
+    assert not player1.board[0, 0].ship_handle.is_down()
 
     # testing return staus and if BoardCell and Ship behave correctyl
     assert player1.take_attack(0, 0) == constants.SHIP_HIT
@@ -322,13 +322,9 @@ def test_Player_take_attack(monkeypatch):
     assert player1.board[0, 0].ship_handle.is_down()
 
     # testing if attacking 1st ship hadn't impact on second one
-    assert (
-        player1.board[0, 1].ship_handle.hit_counter == 0
-    )  # is_segment_hit(0) == False
-    assert (
-        player1.board[1, 1].ship_handle.hit_counter == 0
-    )  # is_segment_hit(1) == False
-    assert player1.board[1, 1].ship_handle.is_down() == False
+    assert player1.board[0, 1].ship_handle.hit_counter == 0
+    assert player1.board[1, 1].ship_handle.hit_counter == 0
+    assert not player1.board[1, 1].ship_handle.is_down()
 
 
 def test_Player_perform_attack(monkeypatch):

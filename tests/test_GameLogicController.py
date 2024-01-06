@@ -1,9 +1,7 @@
 from GameLogicController import GameLogicController
 import constants
 from Player import Player, BotPlayer
-from GameErrors import NotSuchShipToPlaceError
 from datetime import timedelta
-import pytest
 
 
 def test_GameLogicController_init(monkeypatch):
@@ -304,12 +302,15 @@ def test_position_ship_phase_PVP(monkeypatch):
     assert len(controller.player2.ships_to_place) == 1
     assert len(controller.player1.ships_to_place) == 0
 
+    assert controller.phase == constants.READY_TO_SWITCH_PHASE
+    controller.switch_current_player()
+    assert controller.phase == constants.BLACKSCREEN_PHASE
+    controller.exit_black_screen_phase()
+
     # testing if current player has changed
     assert controller.current_player == controller.player2
     assert controller.player_attacked == controller.player1
-    assert controller.phase == constants.BLACKSCREEN_PHASE
 
-    controller.exit_black_screen_phase()
     assert controller.phase == constants.POSITIONING_PHASE
 
     controller.position_ships_phase(
@@ -355,7 +356,7 @@ def test_play_game_phase_PVP(monkeypatch):
     controller.position_ships_phase(
         start_row=0, start_column=0, end_column=0, end_row=4
     )
-
+    controller.switch_current_player()
     controller.exit_black_screen_phase()
 
     # positioning player2 ships
@@ -374,7 +375,6 @@ def test_play_game_phase_PVP(monkeypatch):
     assert controller.current_player == controller.player2
 
     controller.switch_current_player()
-
     assert controller.phase == constants.BLACKSCREEN_PHASE
     assert controller.current_player == controller.player1
     # checking if attack was successful
@@ -493,6 +493,7 @@ def test_round_counter_PVP(monkeypatch):
     game_controller.players_cells_selected(
         start_column=0, start_row=0, end_row=4, end_column=0
     )
+    game_controller.switch_current_player()
     game_controller.exit_black_screen_phase()
     assert game_controller.phase == constants.POSITIONING_PHASE
 
@@ -560,11 +561,3 @@ def test_get_play_time_as_str(monkeypatch):
     time = timedelta(hours=3, minutes=3, seconds=3)
     monkeypatch.setattr("GameLogicController.GameLogicController.game_play_time", time)
     assert game_controller.get_play_time_as_str() == "3 hours, 3 minutes, 3 seconds"
-
-
-def test_players_cells_selected(monkeypatch):
-    assert False
-
-
-def test_enemys_board_mouse_pressed(monkeypatch):
-    assert False
