@@ -1,10 +1,17 @@
 from GameErrors import OcupiedCellError, CellAlreadyShotError
-from Ships import Ship
 import constants
 
 
 class BoardCell:
-    """represents a single cell/tile on game board"""
+    """represents a single cell/tile on game board
+
+    :param _is_free: True if cell is empty(no ship on it)
+    :type _is_free: bool
+    :param _was_shot: True if cell has already been shot
+    :type _was_shot: bool
+    :param _ship_handle: pointer to instance of Ship class position here
+    :type _ship_handle: Ships.Ship
+    """
 
     def __init__(self):
         self._is_free = True
@@ -25,7 +32,8 @@ class BoardCell:
         return self._ship_handle
 
     def position_ship(self, new_ship):
-        """positions provided ship on cell; accepts ONLY Ship class"""
+        """positions provided ship on cell; accepts ONLY Ship class
+        raises OcupiedCellError if cell isn't free"""
         if not self.is_free:
             raise OcupiedCellError()
 

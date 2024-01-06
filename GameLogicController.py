@@ -6,7 +6,42 @@ import pygame
 
 
 class GameLogicController:
-    """handles logic of the game, turns, phases etc"""
+    """handles logic of the game, turns, phases etc
+
+    :param _board_height: how many cells does board have vertically
+    :type _board_height: int
+    :param _board_width: how many cells does board have horizontally
+    :type _board_width: int
+    :param _ship_configuration: represents how many ships of a kind player should place
+    :type _ship_configuration: dict
+    :param _game_is_running: if is's True game is running
+    :type _game_is_running: bool
+    :param _gamemode: stors id of gamemode (PVP or PVC)
+    :type _gamemode: int
+    :param _player1: player of the game(always human)
+    :type _player1: Player.Player
+    :param _player2: second player of game(human in PVP and bot in PVC)
+    :type _player2: Player.Player
+    :param _current_player: equal to currently playing player
+    :type _current_player: Player.Player
+    :param _player_attacked: equal to player that's not playing now (could be attacked)
+    :type _player_attacked: Player.Player
+    :param _phase_to_return: to which phase should game return after leaving blackscreen
+    :type _phase_to_return: int
+    :param _phase: represents current phase of game (start screen, poistioning..)
+    :type _phase: int
+    :param _prompts: list of prompts to display to user
+    :type _prompts: list
+    :param _game_start_time: stores moment in time when shooting phase started
+    :type _game_start_time: int
+    :param _game_play_time: how long has game been in game phase
+    :type _game_play_time: datetime.timedelta
+    :param _rounds_played: how many rounds have been played(round=player has attacked)
+    :type _rounds_played: int
+    :param _winner: instance of player that has won the game
+    :type _winner: Player.Player
+
+    """
 
     def __init__(
         self,
@@ -57,6 +92,14 @@ class GameLogicController:
         return self._current_player
 
     @property
+    def player_attacked(self):
+        return self._player_attacked
+
+    @property
+    def game_is_running(self):
+        return self._game_is_running
+
+    @property
     def rounds_played(self):
         return self._rounds_played
 
@@ -66,6 +109,7 @@ class GameLogicController:
 
     @property
     def winner_name(self):
+        """returns winners name or None"""
         if self._winner is None:
             return None
 
@@ -133,14 +177,6 @@ class GameLogicController:
         )
 
         return statistics
-
-    @property
-    def player_attacked(self):
-        return self._player_attacked
-
-    @property
-    def game_is_running(self):
-        return self._game_is_running
 
     def fetch_prompt(self):
         """returns propt to display and removes it from queue
@@ -334,4 +370,5 @@ class GameLogicController:
             self.play_game_phase(row, column)
 
     def exit_game(self):
+        """method triggered to exit game"""
         self._game_is_running = False

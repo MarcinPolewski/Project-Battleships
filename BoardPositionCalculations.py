@@ -1,5 +1,6 @@
 """ provides functions translating row and column to
-x,y coordinates on screen(or the other way around)"""
+x,y coordinates on screen(or the other way around) for
+positioning on gameboards"""
 import constants
 from GameErrors import OutOfTableError
 

@@ -12,8 +12,6 @@ class Button:
     :type _width: int
     :param _image: image displayed as button
     :type _image: pygame.image
-    :param _is_displayed: True if button is displayed on board
-    :type _is_displayed: bool
     """
 
     def __init__(self, position, screen, image):
@@ -22,12 +20,6 @@ class Button:
         self._width = image.get_width()
         self._image = image
         self._screen = screen
-
-        self._is_visible = False
-
-    def is_visible(self):
-        """returns true if button is displayed on screen"""
-        return self._is_visible
 
     def check_if_mouse_on_button(self, mouse_position):
         """checks if mouse was on button"""
@@ -43,15 +35,9 @@ class Button:
             return True
         return False
 
-    def make_visible(self):
-        self._is_visible = True
-
-    def remove_from_screen(self):
-        self._is_visible = False
-
     def was_pressed(self, mouse_position):
         """returns True if button was pressed"""
-        if self.is_visible and self.check_if_mouse_on_button(mouse_position):
+        if self.check_if_mouse_on_button(mouse_position):
             return True
         return False
 
@@ -61,7 +47,22 @@ class Button:
 
 
 class ButtonHandler:
-    """displays buttons on screen and checks if they have been pressed"""
+    """displays buttons on screen and checks if they have been pressed
+
+    :param _screen: screen where button will be drawn
+    :type _screen: pygame.Surface
+    :param _game_controller: used here only for checking game phase
+    :type _game_controller: GameLogicController.GameLogicController
+    :param _start_buttons: list of button classes to be drawns on start screen
+    :type _start_buttons: list
+    :param _end_buttons: list of button classes to be drawn during game result phase
+    :type _end_buttons: list
+    :param _ready_to_switch_button: list of a single button to be drawn to switch users
+    :type _ready_to_switch_button: list
+    :param _buttons_to_draw: buttons from this list will be drawn when draw() is called
+    :type _buttons_to_draw: list
+
+    """
 
     def __init__(self, screen, game_controller, image_handler):
         self._screen = screen
@@ -93,8 +94,8 @@ class ButtonHandler:
     def check_button_press(self, mouse_press_position, mouse_release_position):
         """if button was pressed returns corresponding button
         else return None"""
-        # button was pressed if it's displayed and mouse was pressed and released on it
 
+        # button was pressed if mouse was pressed and released on it
         for button in self._buttons_to_draw:
             if button.check_if_mouse_on_button(
                 mouse_press_position
