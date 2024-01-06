@@ -2,9 +2,11 @@
 # Dane Autora 
  - imię i nazwisko: Marcin Polewski
  - e-mail: 01187274@pw.edu.pl
- - numer indeksu: 331 425 
 
 # Cel i opis projektu 
+ Projekt powstał jako element zaliczenia pierwszego semestru na studiach informatycznych
+ na Politechnice Warszawskiej
+
  Celem projektu było utworzenie gry w statki w cyfrowej wersji, 
  bazując na wszystkim dobrze znanych zasadach. Owa gra ma kilka wersji, 
  realizowana tutaj to klasyczna - opisana na [wikipedi](https://en.wikipedia.org/wiki/Battleship_(game)), czyli:
