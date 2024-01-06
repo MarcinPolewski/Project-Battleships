@@ -19,9 +19,9 @@
 # Instrukcja gry
  Nalezy uruchomić main.py, co spowoduje odpalenie w nowym okienku gry. 
  Widoczne jest menu główne z trzeba guzikami:
-  - Play PVP <- rozpoczęcie gry w trybie Player vs Player
-  - Play PVP <- rozpoczęcie gry w trybie Player vs Computer
-  - Exit Game <- wyjście z gry
+  - Play PVP - rozpoczęcie gry w trybie Player vs Player
+  - Play PVP - rozpoczęcie gry w trybie Player vs Computer
+  - Exit Game - wyjście z gry
   
  Po wybraniu dowolnego trybu wyswietlają się dwie plansze i pasek statusu. 
  Plansza po lewej stronie jest klasycznie planszą odbecnego gracza(jest podpisana na pasku statusu),
@@ -120,3 +120,22 @@
   - OutOfTableError - wyrzucony jeśli kolumna lub rząd nie występują w tabeli
 
 # Część refleksyjna
+
+### Czego nie udało się zrealizować:
+ - Instrukca wyświetlane na pasku co nalezy zrobic - nie udało się tego zrealizować, gdyz nie bylo juz miejsca na pasku,
+ uwazam ze jego obecna forma wizualna jest ładniejsza, a takie instrukcie przydają się tylko gdy gracz uczy się obsługi - 
+ moze przeczytać intrukcjie 
+ - animacje ataku 
+### Co się zmieniło od pierwotnych załozeń:
+ - Pierwotnie wizualicacja gry miala odbywac się przez dzieciczenie obiektów wyswietlajacych po obiektach odpowiedzialnych za logike,
+ po przemysleniach stwierdzilem, ze bedzie to mniej czytelne i trudniejsze w wykonaniu 
+ - Pierwotnie tryp PVP, ekran startowy i koncowy, i prompty nie byly planowane 
+
+### Wnioski po wykonaniu: 
+ - Warto przed zaczęciem dokonać analizy, zaplanować sobie dokładnie klasy, przemyslec wszystkie etapy projektu. Zacząłem projekt realizować 
+ trochę jak takie proste zadanie do filmiku na laby, chwile przemyślałe i zacząłem pisać. Miałem koncepcje w głowie, ale jakieś utrwalenie tego, 
+ przepmyślenie dalszych kroków byłoby pomocne
+- Trzeba wypracować system monitorowanie progresu na projekcie, to znaczy co jest aktualnie robione, co do zrobienia itp. Bez tego człowiek się trochę gubi
+- Robić backupy od samego początku! Projekt zacząłem robić w lokalnym repozytorium i po wykonaniu juz sporego kawalka roboty chcialem wrzucić to na serwer.
+  niestety coś nie poszło(pewnie z głupty operatora, który stwierdził ze godzina 24 to jest świetny moment na coś takiego) i wszystkie commity znikneły. 
+  Nie miałem zadnego backup tej pracy
