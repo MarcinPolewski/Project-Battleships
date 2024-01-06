@@ -49,7 +49,6 @@ class ScreenHandler:
                 self._blackscreen_prompt
             )
         )
-        self._game_result_background = image_handler.game_result_backround
         self._game_result_image = None
 
         self._screen = screen
@@ -74,6 +73,13 @@ class ScreenHandler:
             self._background_idx = (self._background_idx + 1) % len(self._see_images)
             self._current_background = self._see_images[self._background_idx]
             self._last_background_change = pygame.time.get_ticks()
+
+        # reeets game result image if neccessary
+        if (
+            self._game_result_image is not None
+            and self.phase != constants.GAME_RESULT_PHASE
+        ):
+            self._game_result_image = None
 
     def draw_backroung(self):
         """draws background on screen"""
@@ -105,31 +111,19 @@ class ScreenHandler:
         """draws message to switch users at computer"""
         self._screen.blit(self._blackscreen_prompt, self._blackscreen_prompt_position)
 
-    def calculate_game_result_image_position(self, image_to_position):
-        position = calculate_positioning_in_the_middle_of_image(
-            image_height=constants.SCREEN_HEIGHT,
-            image_width=constants.SCREEN_WIDTH,
-            text_height=image_to_position.get_height(),
-            text_width=image_to_position.get_width(),
-        )
-        return position
-
     def generate_game_result_image(self):
-        game_result = self._game_result_background
+        game_result = self._image_handler.game_result_background
 
-        winner = self._game_controller.winner_name + " has won!!!"
-        winner_image = get_text_image(
-            text=winner,
-            text_color=constants.WINNER_TEXT_COLOR,
-            text_size=constants.WINNER_TEXT_SIZE,
-        )
+        # adding winner to game_result image
+        winner_image = self._image_handler.get_winner_image()
         winner_y = constants.WINNER_VERTICAL_OFFSET
-        winner_x = calculate_x_in_the_middle_of_image(
-            image_width=game_result.get_width(), text_width=winner_image.get_width()
+        winner_x = self._image_handler.calculate_x_to_fit_in_the_middle(
+            outer_image=game_result, inner_image=winner_image
         )
-
         game_result.blit(winner_image, (winner_x, winner_y))
 
+        # adding statistics to game result image
+        # @TODO user image_handler more? it should return statistic image
         y = winner_image.get_height() + constants.STATISTICS_VERTICAL_OFFSET
         x = constants.STATISTICS_HORIZONTAL_OFFSET
 
@@ -138,11 +132,10 @@ class ScreenHandler:
             statistic_value = statistics[statistic_key]
             statistic_text = statistic_key + ": " + statistic_value
 
-            statistic_image = get_text_image(
-                text=statistic_text,
-                text_size=constants.STATISTICS_TEXT_SIZE,
-                text_color=constants.STATISTICS_TEXT_COLOR,
+            statistic_image = self._image_handler.get_statistic_image_from_text(
+                statistic_text
             )
+
             y += statistic_image.get_height() + constants.STATISTIC_SPACING
             game_result.blit(statistic_image, (x, y))
 
@@ -154,7 +147,9 @@ class ScreenHandler:
         if self._game_result_image is None:
             self._game_result_image = self.generate_game_result_image()
             self._game_result_image_position = (
-                self.calculate_game_result_image_position(self._game_result_image)
+                self._image_handler.calculate_x_and_y_to_centre_on_screen(
+                    self._game_result_image
+                )
             )
         self._screen.blit(self._game_result_image, self._game_result_image_position)
 

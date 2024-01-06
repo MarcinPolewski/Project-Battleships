@@ -4,8 +4,8 @@ from copy import copy
 
 
 class ImageHandler:
-    """class returns images(might generate them in the mean time) and handles
-    calculations required for their positioning"""
+    """class provided simple functionality for using images(generating from text
+    calulating right position), move complex operations on images are done outside"""
 
     def __init__(self, asset_loader, game_controller):
         # loading images from memory
@@ -17,49 +17,49 @@ class ImageHandler:
 
     @property
     def see_images(self):
-        return self._assets.see_images
+        return copy(self._assets.see_images)
 
     @property
     def table_image(self):
-        return self._assets.table_image
+        return copy(self._assets.table_image)
 
     @property
-    def game_result_backround(self):
-        return self._assets.game_result_background
+    def game_result_background(self):
+        return copy(self._assets.game_result_background)
 
     @property
     def logo_background(self):
-        return self._assets.logo_background
+        return copy(self._assets.logo_background)
 
     @property
     def small_ship_icon(self):
-        return self._assets.small_ship_icon
+        return copy(self._assets.small_ship_icon)
 
     @property
     def cloud_images(self):
-        return self._assets.cloud_images
+        return copy(self._assets.cloud_images)
 
     @property
     def ship_images(self):
-        return self._assets.ship_images
+        return copy(self._assets.ship_images)
 
     @property
     def status_bar_background(self):
-        return self._assets.status_bar_background
+        return copy(self._assets.status_bar_background)
 
     @property
     def logo_image(self):
         """returns game logo image (generates on if needed)"""
         if self._logo_image is None:
             self._logo_image = self.generate_logo_image()
-        return self._logo_image
+        return copy(self._logo_image)
 
     @property
     def blackscreen_prompt(self):
         """retruns blackscreen prompt image (generates one if needed)"""
         if self._blackscreen_prompt is None:
             self._blackscreen_prompt = self.generate_blackscreen_prompt
-        return self.generate_blackscreen_prompt()
+        return copy(self.generate_blackscreen_prompt())
 
     # @TODO handle situation where x or y is negative
     def calculate_x_to_fit_in_the_middle(self, outer_image, inner_image):
@@ -105,16 +105,21 @@ class ImageHandler:
 
         return image
 
-    def get_game_result_screen(self):
-        """return game result screen image (generates one if needed)"""
-        if self._game_result_screen is None:
-            self._game_result_screen = self.generate_game_result_screen
-        return self._game_result_screen
+    def get_winner_image(self):
+        winner = self._game_controller.winner_name + " has won!!!"
+        winner_image = self.get_image_from_text(
+            text=winner,
+            font=self._assets.pixel_font_for_winner,
+            text_color=constants.WINNER_TEXT_COLOR,
+        )
+        return winner_image
 
-    def get_status_bar(self):
-        """returns current status bar image"""
-        image = self._assets.status_bar_background
-        pass
+    def get_statistic_image_from_text(self, text):
+        return self.get_image_from_text(
+            text=text,
+            font=self._assets.pixel_font_for_statistics,
+            text_color=constants.STATISTICS_TEXT_COLOR,
+        )
 
     def get_prompt_image(self, text):
         font = self._assets.pixel_font_for_prompt
@@ -138,15 +143,6 @@ class ImageHandler:
             font=self._assets.pixel_font_for_message_to_switch,
             text_color=constants.MESSAGE_TO_SWITCH_COLOR,
         )
-
-    def generate_statistics(self):
-        pass
-
-    def generate_winner(self):
-        pass
-
-    def generate_game_result_screen(self):
-        pass  # @TODO
 
 
 def get_text_image(text, text_size, text_color):
