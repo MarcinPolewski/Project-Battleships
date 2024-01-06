@@ -11,7 +11,7 @@ class Button:
     :param _width: witdh of button in pixels
     :type _width: int
     :param _image: image displayed as button
-    :type _image: pygame.image
+    :type _image: pygame.Surface
     """
 
     def __init__(self, position, screen, image):

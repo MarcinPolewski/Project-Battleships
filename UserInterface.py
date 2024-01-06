@@ -25,10 +25,38 @@ from Buttons import (
 
 class ScreenHandler:
     """handles static elements - background, logo, prompt in blackscreen phase
-    and statistics on the end of game screen"""
+    and statistics on the end of game screen
+
+    :param _image_handler: class used for getting images
+    :type _image_hanlder: Images.ImageHandler
+    :param  _screen: screen where elements will be displayed
+    :type _screen: pygame.Surface
+    :param _game_controller: controlls game - used for getting phases
+    :type _game_controller: GameLogicController.GameLogicController
+    :param _see_images: list of see images
+    :type _see_images: list
+    :param _logo: image of logo displayed on start screen
+    :type _logo: pygame.Surface
+    :param _blackscreen_prompt: image of prompt to switch users
+    :type _blackscreen_prompt: pygame.Surface
+    :param _table_image: stores image of table
+    :type _table_image: pygame.Surface
+    :param _blackscreen_prompt_position: stores position of this prompt
+    :type _blackscreen_prompt_position: tuple
+    :param _background_idx: index of image in self._see_images for animations
+    :type _background_idx: int
+    :param _current_background: this background will be displed when draw() is called
+    :type _current_background: pygame.Surface
+    :param _game_result_image: image displayed when game ends(winner and statistics)
+    :type _game_result_image: pygame.Surface
+    :param _last_background_change: moment when background has changed
+    :type _last_background_change: int
+    """
 
     def __init__(self, screen, game_controller, image_handler):
         self._image_handler = image_handler
+        self._screen = screen
+        self._game_controller = game_controller
 
         # loading right images
         self._see_images = image_handler.see_images
@@ -44,10 +72,9 @@ class ScreenHandler:
         )
         self._game_result_image = None
 
-        self._screen = screen
-        self._game_controller = game_controller
         self._background_idx = 0
         self._current_background = self._image_handler.see_images[0]
+        self._game_result_image = None
         self._last_background_change = pygame.time.get_ticks()
 
     @property
@@ -55,7 +82,7 @@ class ScreenHandler:
         return self._game_controller.phase
 
     def update(self):
-        """updated backround animations"""
+        """updates animations"""
 
         # if enough time has passed since last update
         if (
@@ -67,7 +94,7 @@ class ScreenHandler:
             self._current_background = self._see_images[self._background_idx]
             self._last_background_change = pygame.time.get_ticks()
 
-        # reeets game result image if neccessary
+        # resets game result image if neccessary
         if (
             self._game_result_image is not None
             and self.phase != constants.GAME_RESULT_PHASE
@@ -79,7 +106,7 @@ class ScreenHandler:
         self._screen.blit(self._current_background, (0, 0))
 
     def draw_logo(self):
-        """draw logo"""
+        """draw logo on screen"""
         self._screen.blit(self._logo, constants.LOGO_POSITION)
 
     def draw_tables(self):
@@ -105,6 +132,7 @@ class ScreenHandler:
         self._screen.blit(self._blackscreen_prompt, self._blackscreen_prompt_position)
 
     def generate_game_result_image(self):
+        """generates game result image"""
         game_result = self._image_handler.game_result_background
 
         # adding winner to game_result image
@@ -116,7 +144,6 @@ class ScreenHandler:
         game_result.blit(winner_image, (winner_x, winner_y))
 
         # adding statistics to game result image
-        # @TODO user image_handler more? it should return statistic image
         y = winner_image.get_height() + constants.STATISTICS_VERTICAL_OFFSET
         x = constants.STATISTICS_HORIZONTAL_OFFSET
 
@@ -135,7 +162,7 @@ class ScreenHandler:
         return game_result
 
     def draw_game_result(self):
-        """method draws statistics in the middle of screen"""
+        """method draws game result(winner and statistics) in the middle of screen"""
 
         if self._game_result_image is None:
             self._game_result_image = self.generate_game_result_image()
@@ -166,7 +193,20 @@ class ScreenHandler:
 
 
 class StatusBarHandler:
-    """class handles displaying status bar with informations"""
+    """class handles displaying status bar with informations
+
+    :param _image_handler: class used for getting images
+    :type _image_hanlder: Images.ImageHandler
+    :param  _screen: screen where elements will be displayed
+    :type _screen: pygame.Surface
+    :param _game_controller: controlls game - used for getting phases
+    :type _game_controller: GameLogicController.GameLogicController
+    :param _background: image used as background for status bar
+    :type _background: pygame.Surface
+    :param _small_ship_icon: image representing on segment of ship
+    :type _small_ship_icon: pygame.Surface
+
+    """
 
     def __init__(self, screen, game_controller, image_handler):
         self._screen = screen
@@ -191,7 +231,8 @@ class StatusBarHandler:
         self._screen.blit(self._background, (0, 0))
 
     def draw_fleet_of_player(self, player, on_the_left):
-        """draws fleet of one player"""
+        """draws fleet of one player above corresponding
+        table"""
 
         # start drawing over corresponding table and end 600 px
         x = constants.TABLE_HORIZONTAL_OFFSET
@@ -291,7 +332,25 @@ class StatusBarHandler:
 
 
 class Prompt(pygame.sprite.Sprite):
-    """class handles dispalying single message to user"""
+    """class handles dispalying single message to user
+
+    :param _image_handler: class used for getting images
+    :type _image_hanlder: Images.ImageHandler
+    :param  _screen: screen where elements will be displayed
+    :type _screen: pygame.Surface
+    :param _prompt_text: text of prompt
+    :type _prompt_text: str
+    :param _alpha: alpha value of prompt image
+    :type _alpha: int
+    :param _last_update_time: moment when prompt was last updated
+    :type _last_update_time: int
+    :param _cooldown: alpha update cooldown
+    :type _cooldown: int
+    :param _image: image displayed as this prompt
+    :type _image: pygame.Surface
+    :param _position: position of prompt on screen
+    :type _positon: tuple
+    """
 
     def __init__(self, screen, prompt_text, image_handler):
         pygame.sprite.Sprite.__init__(self)
@@ -330,6 +389,15 @@ class Prompt(pygame.sprite.Sprite):
 class PromptHandler:
     """reads fetches propts from game controller,
     creates instance of Prompt and updates all currently visible prompts
+
+    :param _image_handler: class used for getting images
+    :type _image_hanlder: Images.ImageHandler
+    :param  _screen: screen where elements will be displayed
+    :type _screen: pygame.Surface
+    :param _game_controller: controlls game - used for getting phases
+    :type _game_controller: GameLogicController.GameLogicController
+    :param _active_prompts: list of currently displayed prompts
+    :type _actve_prompts: pygame.sprite.Group
     """
 
     def __init__(self, screen, game_controller, image_handler):
@@ -360,7 +428,19 @@ class PromptHandler:
 
 
 class Visualizer:
-    """handles visualising game situation on boards/tables"""
+    """handles visualising game situation on boards/tables
+
+    :param _image_handler: class used for getting images
+    :type _image_hanlder: Images.ImageHandler
+    :param  _screen: screen where elements will be displayed
+    :type _screen: pygame.Surface
+    :param _game_controller: controlls game - used for getting phases
+    :type _game_controller: GameLogicController.GameLogicController
+    :param _cloud_images: list of cloud images
+    :type _cloud_images: list
+    :param _ship_images: list of ship images
+    :type _ship_images: list
+    """
 
     def __init__(self, screen, game_controller, image_handler):
         self._screen = screen
@@ -445,6 +525,20 @@ class InputHandler:
     class has methods, which check if particular event has occured
     if so they trigger right method in GameLogicController and return True,
     so mouse_button_interaction does not have to check further
+
+
+    :param _game_controller: controlls game - used for getting phases
+    :type _game_controller: GameLogicController.GameLogicController
+    :param _button_handler: class responsible for handling buttons
+    :type _button_handler: Buttons.ButtonHandler
+    :param _mouse_press_start_column: column where mouse was pressed
+    :type _mouse_press_start_column: int
+    :param _mouse_press_start_row: row where mouse was pressed
+    :type _mouse_press_start_row: int
+    :param _mouse_press_phase: phase when mouse was pressed
+    :type _mouse_press_phase: int
+    :param _mouse_press_position: position of mouse press
+    :type _mouse_press_position: tuple
     """
 
     def __init__(self, game_controller, button_handler):

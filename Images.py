@@ -12,9 +12,9 @@ class ImageHandler:
     :param _game_controller: used for getting information about game
     :type _game_controller: GameLogicController.GameLogicController
     :param _blackscreen_prompt: image of black screen prompt
-    :type _blackscreen_prompt: pygame.image
+    :type _blackscreen_prompt: pygame.Surface
     :param _logo_image: image of game logo presented on strart screen
-    :type _logo_image: pygame.image
+    :type _logo_image: pygame.Surface
     """
 
     def __init__(self, asset_loader, game_controller):
@@ -103,7 +103,7 @@ class ImageHandler:
         return (x, y)
 
     def get_image_from_text(self, text, font, text_color):
-        """returns pygame.image created from text"""
+        """returns pygame.Surface created from text"""
         return font.render(text, True, text_color)
 
     def get_button_image(self, button_text):
