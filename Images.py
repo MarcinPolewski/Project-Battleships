@@ -4,7 +4,18 @@ from copy import copy
 
 class ImageHandler:
     """class provided simple functionality for using images(generating from text
-    calulating right position), move complex operations on images are done outside"""
+    calulating right position), move complex operations on images are done outside
+
+    :param _assets: stores a class instance responsible for accessing memory
+    :type _assets: MemoryAccess.AssetLoader
+
+    :param _game_controller: used for getting information about game
+    :type _game_controller: GameLogicController.GameLogicController
+    :param _blackscreen_prompt: image of black screen prompt
+    :type _blackscreen_prompt: pygame.image
+    :param _logo_image: image of game logo presented on strart screen
+    :type _logo_image: pygame.image
+    """
 
     def __init__(self, asset_loader, game_controller):
         # loading images from memory
@@ -62,9 +73,13 @@ class ImageHandler:
 
     # @TODO handle situation where x or y is negative
     def calculate_x_to_fit_in_the_middle(self, outer_image, inner_image):
+        """returns x coordinate, where inner_image should be positioned to
+        be horizontally in the middle of outer_image"""
         return (outer_image.get_width() - inner_image.get_width()) // 2
 
     def calculate_y_to_fit_in_the_middle(self, outer_image, inner_image):
+        """returns y coordinate, where inner_image should be positioned
+        to bo vertically in the middle of outer_image"""
         return (outer_image.get_height() - inner_image.get_height()) // 2
 
     def calculate_x_and_y_to_centre_in_image(self, outer_image, inner_image):
@@ -75,7 +90,7 @@ class ImageHandler:
         return (x, y)
 
     def calculate_x_and_y_to_centre_on_screen(self, image):
-        pass
+        """returns (x,y) coordinated of image, so it's placed in the middle of screen"""
         x = (constants.SCREEN_WIDTH - image.get_width()) // 2
         y = (constants.SCREEN_HEIGHT - image.get_height()) // 2
         return (x, y)
@@ -105,6 +120,7 @@ class ImageHandler:
         return image
 
     def get_winner_image(self):
+        """returns winner image"""
         winner = self._game_controller.winner_name + " has won!!!"
         winner_image = self.get_image_from_text(
             text=winner,
@@ -114,6 +130,7 @@ class ImageHandler:
         return winner_image
 
     def get_statistic_image_from_text(self, text):
+        """returns text image used in statistics"""
         return self.get_image_from_text(
             text=text,
             font=self._assets.pixel_font_for_statistics,
@@ -121,6 +138,7 @@ class ImageHandler:
         )
 
     def get_status_bar_image_from_text(self, text):
+        """returns text image used in status bar"""
         return self.get_image_from_text(
             text=text,
             font=self._assets.pixel_font_for_status_bar,
@@ -128,12 +146,14 @@ class ImageHandler:
         )
 
     def get_prompt_image(self, text):
+        """returns text image used in prompts"""
         font = self._assets.pixel_font_for_prompt
         return self.get_image_from_text(
             text=text, font=font, text_color=constants.PROMPT_COLOR
         )
 
     def generate_logo_image(self):
+        """returns generated logo image"""
         image = self._assets.logo_background
         text = "Battleship"
         font = self._assets.pixel_font_for_logo
@@ -144,6 +164,7 @@ class ImageHandler:
         return image
 
     def generate_blackscreen_prompt(self):
+        """retunrs generated blackscreen prompt"""
         return self.get_image_from_text(
             text=constants.MESSAGE_TO_SWITCH,
             font=self._assets.pixel_font_for_message_to_switch,

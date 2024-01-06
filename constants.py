@@ -22,9 +22,9 @@ SHIP_VERTICAL = 2
 # game configurations
 STANDARD_SHIP_QUANTITIES = {
     "Carrier": 1,
-    # "Battleship": 1,
-    # "Cruiser": 4,
-    # "PatrolShip": 3,
+    "Battleship": 1,
+    "Cruiser": 4,
+    "PatrolShip": 3,
 }
 
 # table configurations

@@ -1,7 +1,7 @@
 from GameErrors import CellAlreadyShotError, ShipPlacingError, NotSuchShipToPlaceError
 from BoardCell import BoardCell
 import constants
-from Ships import Ship, Carrier, Battleship, Cruiser, PatrolShip
+from Ships import Carrier, Battleship, Cruiser, PatrolShip
 
 import numpy as np
 import copy
@@ -13,11 +13,20 @@ class Player:
     top left corner has coordinates equal to zero,
     they grow to the right and down
 
-    :param board: stores array of BoardCell 's
-    :param board_width: represents how many columns does the board have
-    :param board_height: represent how many rows does the board have
-    :param ship_configuration: specifies how many ships of particular class
-    should be placed of board
+    :param _board: stores array of BoardCell 's
+    :type _board: numpy array
+    :param _board_width: represents how many columns does the board have
+    :type _board_width: int
+    :param _board_height: represent how many rows does the board have
+    :type _board_height: int
+    :param _potential_targets: list of (row, colum) where player didn't shoot
+    :type _potential_targets: list
+    :param _fleet: list of ships that player has currently on the board
+    :type _fleet: list
+    :param _ships_to_place: list of ships that user should place
+    :type _ships_to_place: list
+
+
     """
 
     def __init__(
@@ -38,13 +47,12 @@ class Player:
             for column in range(board_width):
                 self._board[row][column] = copy.deepcopy(boardcell)
 
-        # initializing set of (column, row) representing
-        # cooridnates of cells, where attack  wasn't performed
+        # initializing potential targets
         for y_it in range(board_height):
             for x_it in range(board_width):
                 self._potential_targets.append((y_it, x_it))
 
-        # initializing ships
+        # initializing ships to place
         for ship_name in constants.STANDARD_SHIP_QUANTITIES:
             quantity = constants.STANDARD_SHIP_QUANTITIES[ship_name]
             if ship_name == "Carrier":
@@ -87,10 +95,8 @@ class Player:
 
     @property
     def is_defeated(self):
-        for ship in self._fleet:
-            if not ship.is_down():
-                return False
-        return True
+        """returns True if player is defeated"""
+        return False if self._fleet else True
 
     def Check_if_ship_can_be_placed(
         self, new_ship_length, orientation, coordinate_x, coordinate_y
@@ -98,7 +104,7 @@ class Player:
         """
         raises errors if player does not have such ship to plac
         or if it is out of the board or if ther's a colision
-        returns new_ship instance
+        if ship can be placed returns new_ship instance
         """
 
         # check if ship fits on the board
@@ -186,6 +192,8 @@ class Player:
         return attack_status
 
     def perform_attack(self, opponent, target_x, target_y):
+        """handles performing attack, raised CellAlreadyShotError
+        or returns attack_status"""
         if (target_y, target_x) not in self._potential_targets:
             raise CellAlreadyShotError()
         attack_status = opponent.take_attack(target_x, target_y)
@@ -193,7 +201,28 @@ class Player:
 
 
 class BotPlayer(Player):
-    """automates some functionality of Player class, to create a game Bot"""
+    """automates some functionality of Player class, to create a game Bot
+
+    Inherited from player class:
+    :param _board: stores array of BoardCell 's
+    :type _board: numpy array
+    :param _board_width: represents how many columns does the board have
+    :type _board_width: int
+    :param _board_height: represent how many rows does the board have
+    :type _board_height: int
+    :param _potential_targets: list of (row, colum) where player didn't shoot
+    :type _potential_targets: list
+    :param _fleet: list of ships that player has currently on the board
+    :type _fleet: list
+    :param _ships_to_place: list of ships that user should place
+    :type _ships_to_place: list
+
+    Bot specyfic:
+    :param _first_hit_of_ship_position: stores (row, column) of first ship hit
+    :type _first_hit_of_ship_position: tuple
+    :param _next_targets: list of next targets of bot - there will attack
+    :type _next_targets: list
+    """
 
     def __init__(
         self,
@@ -218,11 +247,12 @@ class BotPlayer(Player):
         return (new_target_y, new_target_x)
 
     def add_next_target(self, next_target):
+        """adds next target to bot's list"""
         if next_target is not None:
             self._next_targets.append(next_target)
 
     def look_for_target_above(self, target_y, target_x, opponents_board):
-        """adds to next target"""
+        """adds potential targets in line, above current shot"""
         # from target_y-1  to 0 inclusive
         for new_target_y in range(target_y - 1, -1, -1):
             if (new_target_y, target_x) in self._potential_targets:
@@ -233,6 +263,7 @@ class BotPlayer(Player):
                 return
 
     def look_for_target_below(self, target_y, target_x, opponents_board):
+        """adds potential targets in line, below current shot"""
         # from target_y + 1 to the board_height-1 inclusive
         for new_target_y in range(target_y + 1, self._board_height):
             if (new_target_y, target_x) in self._potential_targets:
@@ -243,6 +274,7 @@ class BotPlayer(Player):
                 return
 
     def look_for_target_to_the_left(self, target_y, target_x, opponents_board):
+        """adds potential targets in line, to the left of current shot"""
         # from target_x-1  to 0 inclusive
         for new_target_x in range(target_x - 1, -1, -1):
             if (target_y, new_target_x) in self._potential_targets:
@@ -253,6 +285,7 @@ class BotPlayer(Player):
                 return
 
     def look_for_target_to_the_right(self, target_y, target_x, opponents_board):
+        """adds potential targets in line, to the right of current shot"""
         # from target_y-1  to 0 inclusive
         for new_target_x in range(target_x + 1, self._board_width):
             if (target_y, new_target_x) in self._potential_targets:
@@ -263,6 +296,8 @@ class BotPlayer(Player):
                 return
 
     def look_for_targets_in_line(self, target_y, target_x, line_vertical, opponent):
+        """looks for targets in line with previous
+        shots(after bot got two shots in line)"""
         self._next_targets = []
         opponents_board = opponent.board
         if line_vertical:  # two ship segments have been shot in vertical line
@@ -273,6 +308,7 @@ class BotPlayer(Player):
             self.look_for_target_to_the_left(target_y, target_x, opponents_board)
 
     def handle_next_targets(self, attack_status, target_y, target_x, opponent):
+        """handled next targets for bot"""
         if attack_status == constants.SHIP_SUNK:
             self._next_targets = []
         elif attack_status == constants.SHIP_HIT:
@@ -334,6 +370,7 @@ class BotPlayer(Player):
         self.handle_next_targets(attack_status, new_target_y, new_target_x, opponent)
 
     def position_ships(self):
+        """handles positioning ships on the board"""
         while self._ships_to_place:
             ship_to_position = self._ships_to_place[0]
             is_positioned = False
