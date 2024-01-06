@@ -18,7 +18,18 @@ from Buttons import (
 )
 
 
-class ScreenVisualizer:
+class UIObject:
+    def __init__(self, screen, game_controller, image_handler):
+        self._screen = screen
+        self._game_controller = game_controller
+        self._image_handler = image_handler
+
+    @property
+    def phase(self):
+        return self._game_controller.phase
+
+
+class ScreenVisualizer(UIObject):
     """handles static elements - background, logo, prompt in blackscreen phase
     and statistics on the end of game screen
 
@@ -47,9 +58,7 @@ class ScreenVisualizer:
     """
 
     def __init__(self, screen, game_controller, image_handler):
-        self._image_handler = image_handler
-        self._screen = screen
-        self._game_controller = game_controller
+        super().__init__(screen, game_controller, image_handler)
 
         # loading right images
         self._see_images = image_handler.see_images
@@ -68,10 +77,6 @@ class ScreenVisualizer:
         self._current_background = self._image_handler.see_images[0]
         self._game_result_image = None
         self._last_background_change = pygame.time.get_ticks()
-
-    @property
-    def phase(self):
-        return self._game_controller.phase
 
     def update(self):
         """updates animations"""
@@ -160,7 +165,7 @@ class ScreenVisualizer:
             self.draw_game_result()
 
 
-class StatusBarVisualizer:
+class StatusBarVisualizer(UIObject):
     """class handles displaying status bar with informations
 
     :param _image_handler: class used for getting images
@@ -177,19 +182,13 @@ class StatusBarVisualizer:
     """
 
     def __init__(self, screen, game_controller, image_handler):
-        self._screen = screen
-        self._game_controller = game_controller
-        self._image_handler = image_handler
+        super().__init__(screen, game_controller, image_handler)
 
         # load background
         self._background = image_handler.status_bar_background
 
         # load small ship icon
         self._small_ship_icon = image_handler.small_ship_icon
-
-    @property
-    def phase(self):
-        return self._game_controller.phase
 
     def update(self):
         pass
@@ -354,7 +353,7 @@ class Prompt(pygame.sprite.Sprite):
         self._screen.blit(self._image, self._position)
 
 
-class PromptVisualizer:
+class PromptVisualizer(UIObject):
     """reads fetches propts from game controller,
     creates instance of Prompt and updates all currently visible prompts
 
@@ -369,9 +368,7 @@ class PromptVisualizer:
     """
 
     def __init__(self, screen, game_controller, image_handler):
-        self._game_controller = game_controller
-        self._screen = screen
-        self._image_handler = image_handler
+        super().__init__(screen, game_controller, image_handler)
         self._active_prompts = pygame.sprite.Group()
 
     def update(self):
@@ -395,7 +392,7 @@ class PromptVisualizer:
             prompt.draw()
 
 
-class GameBoardVisualizer:
+class GameBoardVisualizer(UIObject):
     """handles visualising game situation on boards/tables
 
     :param _image_handler: class used for getting images
@@ -413,8 +410,7 @@ class GameBoardVisualizer:
     """
 
     def __init__(self, screen, game_controller, image_handler):
-        self._screen = screen
-        self._game_controller = game_controller
+        super().__init__(screen, game_controller, image_handler)
 
         self._cloud_images = image_handler.cloud_images
         self._ship_images = image_handler.ship_images
@@ -427,10 +423,6 @@ class GameBoardVisualizer:
     @property
     def player2(self):
         return self._game_controller.player2
-
-    @property
-    def phase(self):
-        return self._game_controller.phase
 
     def update(self):
         """updates animations of ships and clouds"""
