@@ -40,7 +40,8 @@ class GameLogicController:
     :type _rounds_played: int
     :param _winner: instance of player that has won the game
     :type _winner: Player.Player
-
+    :param _total_ship_segments: represents how many segments in total ships can have
+    :type _total_ship_segments: int
     """
 
     def __init__(
@@ -68,6 +69,7 @@ class GameLogicController:
         # variables for statistics
         self._game_start_time = pygame.time.get_ticks()
         self._game_play_time = timedelta(milliseconds=0)
+        self._total_ship_segments = None
         self._rounds_played = 0
         self._winner = None
 
@@ -195,6 +197,13 @@ class GameLogicController:
 
         return player_alive_segments_counter
 
+    def get_total_ship_segments(self):
+        """retuns how many ship segments on player can have
+        calculates this value if it has not been done previously"""
+        if self._total_ship_segments is None:
+            self._total_ship_segments = self.calculate_total_ship_segments
+        return self._total_ship_segments()
+
     def calculate_total_ship_segments(self):
         """returns how many ship segments are in total"""
         total_segment_counter = 0
@@ -210,7 +219,7 @@ class GameLogicController:
         divided by total amount of segments"""
 
         player_alive_segments_counter = self.calculate_players_alive_segments(player)
-        total_segment_counter = self.calculate_total_ship_segments()
+        total_segment_counter = self.get_total_ship_segments()
 
         try:
             return (player_alive_segments_counter * 100) // total_segment_counter
