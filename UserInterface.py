@@ -39,8 +39,6 @@ class ScreenHandler:
     :type _logo: pygame.Surface
     :param _blackscreen_prompt: image of prompt to switch users
     :type _blackscreen_prompt: pygame.Surface
-    :param _table_image: stores image of table
-    :type _table_image: pygame.Surface
     :param _blackscreen_prompt_position: stores position of this prompt
     :type _blackscreen_prompt_position: tuple
     :param _background_idx: index of image in self._see_images for animations
@@ -62,7 +60,6 @@ class ScreenHandler:
         self._see_images = image_handler.see_images
         self._logo = image_handler.logo_image
         self._blackscreen_prompt = image_handler.blackscreen_prompt
-        self._table_image = image_handler.table_image
 
         # loading positions
         self._blackscreen_prompt_position = (
@@ -108,24 +105,6 @@ class ScreenHandler:
     def draw_logo(self):
         """draw logo on screen"""
         self._screen.blit(self._logo, constants.LOGO_POSITION)
-
-    def draw_tables(self):
-        """draws tables on screen"""
-        # drawing left table
-        self._screen.blit(
-            self._table_image,
-            (constants.TABLE_HORIZONTAL_OFFSET, constants.TABLE_VERTICAL_OFFSET),
-        )
-        # drawing right table
-        self._screen.blit(
-            self._table_image,
-            (
-                constants.SCREEN_WIDTH
-                - constants.TABLE_HORIZONTAL_OFFSET
-                - constants.TABLE_SIZE,
-                constants.TABLE_VERTICAL_OFFSET,
-            ),
-        )
 
     def draw_message_to_switch(self):
         """draws message to switch users at computer"""
@@ -179,12 +158,6 @@ class ScreenHandler:
 
         if self.phase == constants.GAME_START_SCREEN:
             self.draw_logo()
-        elif self.phase in [
-            constants.GAME_PHASE,
-            constants.POSITIONING_PHASE,
-            constants.READY_TO_SWITCH_PHASE,
-        ]:
-            self.draw_tables()
         elif self.phase == constants.BLACKSCREEN_PHASE:
             self.draw_message_to_switch()
 
@@ -440,6 +413,8 @@ class Visualizer:
     :type _cloud_images: list
     :param _ship_images: list of ship images
     :type _ship_images: list
+    :param _table_image: stores image of table
+    :type _table_image: pygame.Surface
     """
 
     def __init__(self, screen, game_controller, image_handler):
@@ -448,6 +423,7 @@ class Visualizer:
 
         self._cloud_images = image_handler.cloud_images
         self._ship_images = image_handler.ship_images
+        self._table_image = image_handler.table_image
 
     @property
     def player1(self):
@@ -467,12 +443,28 @@ class Visualizer:
         # after shot animation at enemys board
         pass
 
+    def draw_table(self, is_left):
+        """draws single table either on the left or right"""
+        y = constants.TABLE_VERTICAL_OFFSET
+        x = 0
+        if is_left:
+            x = constants.TABLE_HORIZONTAL_OFFSET
+        else:
+            x = (
+                constants.SCREEN_WIDTH
+                - constants.TABLE_HORIZONTAL_OFFSET
+                - constants.TABLE_SIZE
+            )
+        self._screen.blit(self._table_image, (x, y))
+
     def draw_one_player(self, player, for_left_table):
         """draws view of player on the board
         if for_left_table is True draws player's fleet on left table (ships)
         else draws what player's opponent sees on right table (clouds and ships)
         """
         # @TODO add animation support for this methods
+
+        # draw game situation
         board_height = player.board_height
         board_width = player.board_width
 
@@ -504,6 +496,8 @@ class Visualizer:
                     elif not board_cell.is_free:
                         # drawing hit ship
                         self._screen.blit(self._ship_images[3], position)
+        # draw table image
+        self.draw_table(for_left_table)
 
     def draw(self):
         """draws current player's view on the board"""
