@@ -122,14 +122,21 @@
 # Część refleksyjna
 
 ### Czego nie udało się zrealizować:
- - Instrukcja wyświetlana na pasku co nalezy zrobic - nie udało się tego zrealizować, gdyz nie bylo juz miejsca na pasku,
+ - Instrukcja co nalezy teraz zrobić, wyświetlana na pasku statusu - nie udało się tego zrealizować, gdyz nie bylo juz miejsca na pasku,
  uwazam ze jego obecna forma wizualna jest ładniejsza, a takie instrukcie przydają się tylko gdy gracz uczy się obsługi - 
- moze przeczytać intrukcjie 
- - animacje ataku 
+ moze przeczytać intrukcje. Zawiodło planowanie..
+ - animacje ataku - pierwotnie zamierzałem to zrealizować, ale w późniejszych etapach projektu doszedłem do wniosku ze wole skupic 
+ sie na funkcjonalnych aspektach, jak dodawanie menu, statystyk itp 
+ - Czas jak długo prompt miałby wyświetlać się na ekranie miał zalezeć od długości tekstu, ale przyjenty cooldown tak dobrze realizuje te funckjonalność, 
+ nie chicałem psuć tego co działa
+
 ### Co się zmieniło od pierwotnych załozeń:
  - Pierwotnie wizualicacja gry miala odbywac się przez dzieciczenie obiektów wyswietlajacych po obiektach odpowiedzialnych za logike,
  po przemysleniach stwierdzilem, ze bedzie to mniej czytelne i trudniejsze w wykonaniu 
  - Pierwotnie tryp PVP, ekran startowy i koncowy, i prompty nie byly planowane 
+ - Klasa ImageHandler miała generować wszytkie obrazy, aby trochę zaprać funkjonalności z innych klas UI, ale ostatecznie stwierdziłem
+ ze efekt byłby odwrotny i zamiast lepszej seraracji uzyskałbym zwalenie wszystkiego do jednej klasy(generowanie obrazów to znaczna część kod w UI)
+ ###
 
 ### Wnioski po wykonaniu: 
  - Warto przed zaczęciem dokonać analizy, zaplanować sobie dokładnie klasy, przemyslec wszystkie etapy projektu. Zacząłem projekt realizować 

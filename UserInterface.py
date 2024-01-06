@@ -426,8 +426,7 @@ class GameBoardVisualizer(UIObject):
 
     def update(self):
         """updates animations of ships and clouds"""
-        # @TODO only one cell at the start of round in players board
-        # after shot animation at enemys board
+        # @TODO
         pass
 
     def draw_table(self, is_left):
