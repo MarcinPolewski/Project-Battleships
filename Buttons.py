@@ -139,7 +139,7 @@ class PlayPVPButton(Button):
 class PlayPVCButton(Button):
     def __init__(self, screen, image_handler):
         # loading button image
-        image = image_handler.get_button_image("Play PVP")
+        image = image_handler.get_button_image("Play PVC")
         position = constants.PVC_BUTTON_POSITION
         super().__init__(position=position, screen=screen, image=image)
 
