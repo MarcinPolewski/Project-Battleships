@@ -24,9 +24,9 @@
   - Exit Game - wyjście z gry
   
  Po wybraniu dowolnego trybu wyswietlają się dwie plansze i pasek statusu. 
- Plansza po lewej stronie jest klasycznie planszą odbecnego gracza(jest podpisana na pasku statusu),
+ Plansza po lewej stronie jest klasycznie planszą odbecnego gracza (jest podpisana na pasku statusu),
  planasza po prawej jest planszą oponenta. Na pasku statusu wyświetla się status floty - ile statkow 
- danego typu grasz ma rozmieszczonych na planszy. Oznacza to, ze napoczatku wszystkie wartosci pokazue 0 dzielone 
+ danego typu grasz ma rozmieszczonych na planszy. Oznacza to, ze na poczatku wszystkie wartosci pokazue 0 dzielone 
  przez liczbe statkow danego typu jaka nalezy rozmiescic. Następnie gdy zestrzelimy jakis statek, to na pasku statusu
  liczba statkow danego typu zmniejszy sie o 1  
 
@@ -122,7 +122,7 @@
 # Część refleksyjna
 
 ### Czego nie udało się zrealizować:
- - Instrukca wyświetlane na pasku co nalezy zrobic - nie udało się tego zrealizować, gdyz nie bylo juz miejsca na pasku,
+ - Instrukcja wyświetlana na pasku co nalezy zrobic - nie udało się tego zrealizować, gdyz nie bylo juz miejsca na pasku,
  uwazam ze jego obecna forma wizualna jest ładniejsza, a takie instrukcie przydają się tylko gdy gracz uczy się obsługi - 
  moze przeczytać intrukcjie 
  - animacje ataku 
@@ -137,5 +137,5 @@
  przepmyślenie dalszych kroków byłoby pomocne
 - Trzeba wypracować system monitorowanie progresu na projekcie, to znaczy co jest aktualnie robione, co do zrobienia itp. Bez tego człowiek się trochę gubi
 - Robić backupy od samego początku! Projekt zacząłem robić w lokalnym repozytorium i po wykonaniu juz sporego kawalka roboty chcialem wrzucić to na serwer.
-  niestety coś nie poszło(pewnie z głupty operatora, który stwierdził ze godzina 24 to jest świetny moment na coś takiego) i wszystkie commity znikneły. 
+  niestety coś nie poszło (sprytny student stwierdził ze godzina 24 to jest świetny moment na coś takiego) i wszystkie commity znikneły. 
   Nie miałem zadnego backup tej pracy
