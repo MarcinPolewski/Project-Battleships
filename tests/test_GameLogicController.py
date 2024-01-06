@@ -1,6 +1,7 @@
 from GameLogicController import GameLogicController
 import constants
 from Player import Player, BotPlayer
+from Ships import Carrier
 from datetime import timedelta
 
 
@@ -561,3 +562,78 @@ def test_get_play_time_as_str(monkeypatch):
     time = timedelta(hours=3, minutes=3, seconds=3)
     monkeypatch.setattr("GameLogicController.GameLogicController.game_play_time", time)
     assert game_controller.get_play_time_as_str() == "3 hours, 3 minutes, 3 seconds"
+
+
+def test_generate_statistics(monkeypatch):
+    def get_fake_time(_):
+        return "1 minute, 30 seconds"
+
+    def fake_winner_percentage(a, b):
+        return 90
+
+    monkeypatch.setattr(
+        "GameLogicController.GameLogicController.get_play_time_as_str", get_fake_time
+    )
+    monkeypatch.setattr("GameLogicController.GameLogicController.rounds_played", 50)
+    monkeypatch.setattr(
+        "GameLogicController.GameLogicController.calculate_percentage_state_of_players_fleet",
+        fake_winner_percentage,
+    )
+
+    game_controller = GameLogicController()
+    a = Player()
+
+    # testing monkey patch
+    assert game_controller.get_play_time_as_str() == "1 minute, 30 seconds"
+    assert game_controller.rounds_played == 50
+    assert game_controller.calculate_percentage_state_of_players_fleet(a) == 90
+
+    expected_output = {
+        "Time of gameplay": "1 minute, 30 seconds",
+        "Rounds played": "50",
+        "Percentage of winners fleet intact": "90",
+    }
+    assert game_controller.generate_statistics() == expected_output
+
+
+def test_calculate_players_alive_segments_and_calculate_percentage_of_players_fleet(
+    monkeypatch,
+):
+    ship = Carrier()
+    monkeypatch.setattr("Player.Player.fleet", [ship])
+
+    game_controller = GameLogicController()
+    player = Player()
+    assert game_controller.calculate_players_alive_segments(player) == 5
+
+    # player's ship was shot
+    player.fleet[0].take_damage()
+    assert game_controller.calculate_players_alive_segments(player) == 4
+
+    # player's ship was shot
+    player.fleet[0].take_damage()
+    assert game_controller.calculate_players_alive_segments(player) == 3
+
+    # testing calculate_percentage_state_of_players_fleet
+    game_controller.calculate_percentage_state_of_players_fleet(player) == (
+        3 * 100
+    ) // 5
+
+
+def test_calculate_total_ship_segments(monkeypatch):
+    quantities = {
+        "Carrier": 1,
+        "Battleship": 1,
+        "Cruiser": 4,
+        "PatrolShip": 3,
+    }
+    monkeypatch.setattr("constants.STANDARD_SHIP_QUANTITIES", quantities)
+    game_controller = GameLogicController()
+    assert game_controller.get_total_ship_segments() == (5 + 4 + 12 + 6)
+
+
+def test_exit_game():
+    game_controller = GameLogicController()
+    assert game_controller.game_is_running
+    game_controller.exit_game()
+    assert not game_controller.game_is_running
