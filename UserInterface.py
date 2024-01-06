@@ -21,13 +21,6 @@ from Buttons import (
     ButtonHandler,
     SwitchUserButton,
 )
-from TextImageGenerator import (
-    get_text_image,
-    calculate_text_position_for_top_half_of_image,
-    calculate_positioning_in_the_middle_of_image,
-    calculate_y_in_the_middle_of_image,
-    calculate_x_in_the_middle_of_image,
-)
 
 
 class ScreenHandler:
@@ -214,11 +207,14 @@ class StatusBarHandler:
             quantity = constants.STANDARD_SHIP_QUANTITIES[ship_name]
             length = constants.SHIP_LENGTHS[ship_name]
 
-            # drawing ship
+            # drawing ship icon
             for i in range(length):
                 self._screen.blit(self._small_ship_icon, (x, y))
-                x += constants.SMALL_SHIP_ICON_SIZE - 4
-                # -4 to make images overlap = looks better
+                x += (
+                    constants.SMALL_SHIP_ICON_SIZE
+                    - constants.SMALL_SHIP_ICON_OFFSET_TO_OVERLAP
+                )
+                # subtracting to make icons overlap = looks better
 
             # calculate player's amount of this kind of ship
             ship_counter = 0
@@ -226,18 +222,16 @@ class StatusBarHandler:
                 if ship.length == length:
                     ship_counter += 1
 
-            # generate text image
+            # generate image of text representing how many ships of kind are on board
             text = f"{ship_counter}/{quantity}"
-            text_image = get_text_image(
-                text=text,
-                text_size=constants.STATUS_BAR_FONT_SIZE,
-                text_color=constants.STATUS_BAR_TEXT_COLOR,
-            )
+            text_image = self._image_handler.get_status_bar_image_from_text(text)
 
-            x += 10
+            # adding spacing between ship icon and value
+            x += constants.STATUS_BAR_INFORMATION_SPACING
 
             self._screen.blit(text_image, (x, y))
 
+            # added spacing between information about this ship and another
             x += constants.SMALL_SHIP_ICON_SIZE * 2
 
     def draw_fleet_status(self):
@@ -269,11 +263,10 @@ class StatusBarHandler:
 
     def draw_name_above_table(self, name, above_left_table):
         """draws players name above corresponing table"""
-        image = get_text_image(
-            text=name,
-            text_size=constants.STATUS_BAR_FONT_SIZE,
-            text_color=constants.STATUS_BAR_TEXT_COLOR,
-        )
+        # loading player's name image
+        image = self._image_handler.get_status_bar_image_from_text(name)
+
+        # calculating position
         x = self.calculate_x_position_of_name(image, above_left_table)
         y = constants.PLAYER_NAME_VERTICAL_OFFSET
 

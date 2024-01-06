@@ -1,4 +1,3 @@
-import pygame
 import constants
 from copy import copy
 
@@ -121,6 +120,13 @@ class ImageHandler:
             text_color=constants.STATISTICS_TEXT_COLOR,
         )
 
+    def get_status_bar_image_from_text(self, text):
+        return self.get_image_from_text(
+            text=text,
+            font=self._assets.pixel_font_for_status_bar,
+            text_color=constants.STATISTICS_TEXT_COLOR,
+        )
+
     def get_prompt_image(self, text):
         font = self._assets.pixel_font_for_prompt
         return self.get_image_from_text(
@@ -143,12 +149,3 @@ class ImageHandler:
             font=self._assets.pixel_font_for_message_to_switch,
             text_color=constants.MESSAGE_TO_SWITCH_COLOR,
         )
-
-
-def get_text_image(text, text_size, text_color):
-    """returns image with text provided text"""
-    # text_font = pygame.font.SysFont("Arial", text_size)
-    text_font = pygame.font.Font("assets/fonts/PixelifySans-Regular.ttf", text_size)
-    image = text_font.render(text, True, text_color)
-
-    return image

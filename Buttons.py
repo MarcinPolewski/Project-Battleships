@@ -1,9 +1,4 @@
-import pygame
 import constants
-from TextImageGenerator import (
-    get_text_image,
-    calculate_positioning_in_the_middle_of_image,
-)
 
 
 class Button:

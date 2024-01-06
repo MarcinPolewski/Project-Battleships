@@ -100,9 +100,11 @@ PROMPT_COOLDOWN = 30
 # PROMPTS
 MESSAGE_TO_SWITCH = "Switch user at the computer, press mouse button to continue..."
 
-# Positioning on screen bar
+# Positioning on status bar
 FLEET_STATUS_VERTICAL_OFFSET = 50
 SMALL_SHIP_ICON_SIZE = 24  # in pixels
+SMALL_SHIP_ICON_OFFSET_TO_OVERLAP = 4
+STATUS_BAR_INFORMATION_SPACING = 10
 
 STATUS_BAR_FONT_SIZE = 20
 STATUS_BAR_TEXT_COLOR = (0, 0, 0)
