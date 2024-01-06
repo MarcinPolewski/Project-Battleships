@@ -292,6 +292,7 @@ class GameLogicController:
 
         # switch phase if all players have placed ships
         if (not self._player1.ships_to_place) and (not self._player2.ships_to_place):
+            self._prompts.append("All ships positioned")
             self._phase = constants.GAME_PHASE
             self._phase_to_return = constants.GAME_PHASE
             return
@@ -301,6 +302,7 @@ class GameLogicController:
             not self._current_player.ships_to_place
         ) and self._gamemode == constants.PVP:
             self._phase = constants.READY_TO_SWITCH_PHASE
+            self._prompts.append("All ships positioned")
 
     def play_game_phase(self, shot_row, shot_column):
         """handles main game phase(when player(s) shoot)"""
