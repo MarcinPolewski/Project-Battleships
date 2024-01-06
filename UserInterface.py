@@ -13,7 +13,7 @@ from Buttons import (
     PlayPVCButton,
     ExitStartScreenButton,
     ExitEndScreenButton,
-    ReplayButton,
+    MainMenuButton,
     SwitchUserButton,
 )
 
@@ -651,7 +651,7 @@ class InputHandler:
             self._game_controller.exit_game()
         elif isinstance(button, ExitEndScreenButton):
             self._game_controller.exit_game()
-        elif isinstance(button, ReplayButton):
+        elif isinstance(button, MainMenuButton):
             self._game_controller.__init__()
 
         return True

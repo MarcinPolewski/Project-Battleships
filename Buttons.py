@@ -76,7 +76,7 @@ class ButtonHandler:
         ]
         # initialising buttons for end game screen
         self._end_buttons = [
-            ReplayButton(screen=screen, image_handler=image_handler),
+            MainMenuButton(screen=screen, image_handler=image_handler),
             ExitEndScreenButton(screen=screen, image_handler=image_handler),
         ]
         # initialisinng button for switching users
@@ -156,11 +156,11 @@ class ExitEndScreenButton(Button):
         super().__init__(position=position, screen=screen, image=image)
 
 
-class ReplayButton(Button):
+class MainMenuButton(Button):
     def __init__(self, screen, image_handler):
         # loading button image
         image = image_handler.get_button_image("Main Menu")
-        position = constants.REPLAY_BUTTON_POSITION
+        position = constants.MAIN_MENU_BUTTON_POSITION
         super().__init__(position=position, screen=screen, image=image)
 
 
