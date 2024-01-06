@@ -23,7 +23,7 @@ from Buttons import (
 )
 
 
-class ScreenHandler:
+class ScreenVisualizer:
     """handles static elements - background, logo, prompt in blackscreen phase
     and statistics on the end of game screen
 
@@ -165,7 +165,7 @@ class ScreenHandler:
             self.draw_game_result()
 
 
-class StatusBarHandler:
+class StatusBarVisualizer:
     """class handles displaying status bar with informations
 
     :param _image_handler: class used for getting images
@@ -359,7 +359,7 @@ class Prompt(pygame.sprite.Sprite):
         self._screen.blit(self._image, self._position)
 
 
-class PromptHandler:
+class PromptVisualizer:
     """reads fetches propts from game controller,
     creates instance of Prompt and updates all currently visible prompts
 
@@ -400,7 +400,7 @@ class PromptHandler:
             prompt.draw()
 
 
-class Visualizer:
+class GameBoardVisualizer:
     """handles visualising game situation on boards/tables
 
     :param _image_handler: class used for getting images
@@ -704,19 +704,19 @@ def main():
     image_handler = ImageHandler(
         asset_loader=asset_loader, game_controller=game_controller
     )
-    visualizer = Visualizer(
+    game_board_visualizer = GameBoardVisualizer(
         screen=game_screen, game_controller=game_controller, image_handler=image_handler
     )
-    screen_handler = ScreenHandler(
+    screen_visualizer = ScreenVisualizer(
         screen=game_screen, game_controller=game_controller, image_handler=image_handler
     )
     button_handler = ButtonHandler(
         screen=game_screen, game_controller=game_controller, image_handler=image_handler
     )
-    prompt_handler = PromptHandler(
+    prompt_visualizer = PromptVisualizer(
         screen=game_screen, game_controller=game_controller, image_handler=image_handler
     )
-    status_bar_hanlder = StatusBarHandler(
+    status_bar_visualizer = StatusBarVisualizer(
         screen=game_screen, game_controller=game_controller, image_handler=image_handler
     )
     input_handler = InputHandler(
@@ -729,18 +729,18 @@ def main():
         clock.tick(constants.FPS)
 
         # UPDATE ELEMENTS
-        screen_handler.update()
-        visualizer.update()
+        screen_visualizer.update()
+        game_board_visualizer.update()
         button_handler.update()
-        prompt_handler.update()
-        status_bar_hanlder.update()
+        prompt_visualizer.update()
+        status_bar_visualizer.update()
 
         # DRAW ELEMENTS
-        screen_handler.draw()
-        visualizer.draw()
+        screen_visualizer.draw()
+        game_board_visualizer.draw()
         button_handler.draw()
-        prompt_handler.draw()
-        status_bar_hanlder.draw()
+        prompt_visualizer.draw()
+        status_bar_visualizer.draw()
 
         pygame.display.update()
 
