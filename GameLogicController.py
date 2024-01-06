@@ -300,7 +300,7 @@ class GameLogicController:
         elif (
             not self._current_player.ships_to_place
         ) and self._gamemode == constants.PVP:
-            self.switch_current_player()
+            self._phase = constants.READY_TO_SWITCH_PHASE
 
     def play_game_phase(self, shot_row, shot_column):
         """handles main game phase(when player(s) shoot)"""
